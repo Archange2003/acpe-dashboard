@@ -22,6 +22,7 @@ from data_prep import load_demandeurs, load_offres, load_ground_truth  # noqa: E
 from run_matching import generate_recommendations  # noqa: E402
 from search import SearchEngine  # noqa: E402
 from skill_gap import skill_gap  # noqa: E402
+from branding import render_header, render_footer  # noqa: E402
 
 st.set_page_config(page_title="ACPE — Tableau de bord d'appariement", layout="wide", page_icon="🧭")
 
@@ -52,8 +53,7 @@ def get_search_engine():
 dem, off, gt = get_data()
 reco = get_recommendations(dem, off)
 
-st.title("🧭 Tableau de bord décisionnel — Appariement Demandeurs / Offres")
-st.caption("Agence Congolaise pour l'Emploi (ACPE) — Hackathon IndabaX Congo 2026")
+render_header()
 
 tab_overview, tab_reco, tab_search, tab_skillgap = st.tabs(
     ["📊 Vue d'ensemble", "🎯 Recommandations", "🔎 Recherche intelligente (Bonus 1)", "🧩 Écarts de compétences (Bonus 2)"]
@@ -80,7 +80,7 @@ with tab_overview:
         top_sect = off[off["secteur"] != ""]["secteur"].value_counts().head(10).reset_index()
         top_sect.columns = ["secteur", "nombre"]
         fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h", color="nombre",
-                     color_continuous_scale="Blues")
+                     color_continuous_scale=["#d9f2e3", "#009543"])
         fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -89,7 +89,7 @@ with tab_overview:
         top_metiers = dem[dem["qualification_metier"] != ""]["qualification_metier"].value_counts().head(10).reset_index()
         top_metiers.columns = ["métier", "nombre"]
         fig = px.bar(top_metiers, x="nombre", y="métier", orientation="h", color="nombre",
-                     color_continuous_scale="Oranges")
+                     color_continuous_scale=["#fdf0c4", "#C9A227"])
         fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -98,7 +98,9 @@ with tab_overview:
         st.subheader("Répartition géographique des offres")
         lieu_counts = off[off["lieu"] != ""]["lieu"].value_counts().head(12).reset_index()
         lieu_counts.columns = ["lieu", "nombre"]
-        fig = px.pie(lieu_counts, names="lieu", values="nombre", hole=0.45)
+        fig = px.pie(lieu_counts, names="lieu", values="nombre", hole=0.45,
+                     color_discrete_sequence=["#009543", "#FBDE4A", "#DC241F", "#C9A227", "#0B4F2C",
+                                               "#F3D77A", "#8a3a00", "#5a5a5a", "#2b6f4a", "#e2b93b"])
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -106,7 +108,8 @@ with tab_overview:
         st.subheader("Objectif des demandeurs")
         obj_counts = dem["Objectif"].value_counts().reset_index()
         obj_counts.columns = ["objectif", "nombre"]
-        fig = px.pie(obj_counts, names="objectif", values="nombre", hole=0.45)
+        fig = px.pie(obj_counts, names="objectif", values="nombre", hole=0.45,
+                     color_discrete_sequence=["#009543", "#FBDE4A", "#DC241F"])
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -174,5 +177,4 @@ with tab_skillgap:
             for c in result["competences_manquantes"] or ["(aucune)"]:
                 st.markdown(f"- {c}")
 
-st.divider()
-st.caption("Prototype réalisé dans le cadre du Hackathon IndabaX Congo 2026 — moteur d'appariement TF-IDF + règles métier.")
+render_footer()
