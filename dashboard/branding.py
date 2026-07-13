@@ -30,11 +30,30 @@ from typing import Optional
 
 ASSETS_DIR = Path(__file__).parent / "assets"
 
-# Couleurs officielles (approximatives) du drapeau congolais
-CG_GREEN = "#009543"
-CG_YELLOW = "#FBDE4A"
-CG_RED = "#DC241F"
-CG_GOLD = "#C9A227"
+# Palette — couleurs institutionnelles du drapeau congolais + tons complémentaires
+CG_GREEN = "#0B6B3A"      # foret — vert profond, couleur primaire
+CG_YELLOW = "#F2C230"     # savane — jaune/or du drapeau, accent chaleureux
+CG_RED = "#B7241D"        # braise — rouge du drapeau, accent fort (usage parcimonieux)
+CG_GOLD = "#B8862B"       # or institutionnel — armoiries, devise
+CG_RIVER = "#1F4B57"      # fleuve — bleu-vert profond, ton froid complémentaire (graphiques)
+CG_IVORY = "#FBFAF6"      # ivoire — fond de page, très légèrement chaud
+CG_INK = "#16241C"        # encre — texte principal
+
+FONTS_IMPORT = (
+    "https://fonts.googleapis.com/css2?"
+    "family=Space+Grotesk:wght@500;600;700&"
+    "family=Inter:wght@400;500;600;700&"
+    "family=IBM+Plex+Mono:wght@500;600&display=swap"
+)
+
+
+def _clean(html: str) -> str:
+    """Supprime l'indentation de chaque ligne d'un bloc HTML/SVG multi-lignes.
+    Nécessaire car Markdown interprète tout contenu indenté de 4 espaces ou plus
+    comme un bloc de code (donc affiché en texte brut au lieu d'être rendu) —
+    piège classique avec des f-strings multi-lignes à l'intérieur de fonctions
+    indentées."""
+    return "\n".join(line.strip() for line in html.strip("\n").splitlines())
 
 
 def _b64(path: Path) -> str:
@@ -55,9 +74,8 @@ def _image_tag(filename: str, height: int, alt: str) -> Optional[str]:
 def flag_svg(width: int = 64, height: int = 43, rounded: bool = True) -> str:
     """Drapeau congolais (bande jaune diagonale entre triangle vert et triangle rouge)."""
     radius = 6 if rounded else 0
-    return f"""
-    <svg width="{width}" height="{height}" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"
-         style="border-radius:{radius}px; box-shadow:0 1px 4px rgba(0,0,0,0.25); display:block;">
+    return _clean(f"""
+    <svg width="{width}" height="{height}" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" style="border-radius:{radius}px; box-shadow:0 1px 4px rgba(0,0,0,0.25); display:block;">
       <clipPath id="flagClip"><rect width="900" height="600" rx="14" ry="14"/></clipPath>
       <g clip-path="url(#flagClip)">
         <rect width="900" height="600" fill="{CG_YELLOW}"/>
@@ -65,14 +83,14 @@ def flag_svg(width: int = 64, height: int = 43, rounded: bool = True) -> str:
         <polygon points="900,150 900,600 225,600" fill="{CG_RED}"/>
       </g>
     </svg>
-    """
+    """)
 
 
 # --------------------------------------------------------------------------- Blason stylisé
 def coat_of_arms_svg(size: int = 92) -> str:
     """Emblème stylisé (interprétation simplifiée, non officielle) évoquant les
     armoiries congolaises : couronne forestière, fasce fluviale, devise nationale."""
-    return f"""
+    return _clean(f"""
     <svg width="{size}" height="{size}" viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <path id="topArc" d="M 20,110 A 90,90 0 0 1 200,110" fill="none"/>
@@ -81,8 +99,6 @@ def coat_of_arms_svg(size: int = 92) -> str:
           <stop offset="100%" stop-color="{CG_GOLD}"/>
         </linearGradient>
       </defs>
-
-      <!-- couronne forestière stylisée -->
       <g fill="{CG_GOLD}">
         <circle cx="110" cy="30" r="9"/>
         <circle cx="80" cy="24" r="7"/>
@@ -90,64 +106,36 @@ def coat_of_arms_svg(size: int = 92) -> str:
         <circle cx="55" cy="34" r="6"/>
         <circle cx="165" cy="34" r="6"/>
       </g>
-
-      <!-- texte arqué : République du Congo -->
-      <text font-size="12.5" font-weight="700" fill="#5b4300" letter-spacing="1.2"
-            font-family="Georgia, 'Times New Roman', serif">
-        <textPath href="#topArc" startOffset="50%" text-anchor="middle">
-          RÉPUBLIQUE DU CONGO
-        </textPath>
-      </text>
-
-      <!-- écu -->
-      <path d="M 45,55 L 175,55 L 175,140 Q 175,190 110,215 Q 45,190 45,140 Z"
-            fill="url(#shieldGold)" stroke="#5b4300" stroke-width="2.5"/>
-
-      <!-- fasce ondée (fleuve) -->
-      <path d="M 45,120 Q 65,108 85,120 T 125,120 T 165,120 L 175,124 L 175,140
-               Q 175,190 110,215 Q 45,190 45,140 Z"
-            fill="{CG_GREEN}" opacity="0.9"/>
-      <path d="M 45,108 Q 65,96 85,108 T 125,108 T 165,108 L 175,112 L 175,124
-               Q 65,108 45,120 Z"
-            fill="{CG_GREEN}"/>
-
-      <!-- lion stylisé tenant un flambeau -->
+      <text font-size="12.5" font-weight="700" fill="#5b4300" letter-spacing="1.2" font-family="Georgia, serif"><textPath href="#topArc" startOffset="50%" text-anchor="middle">RÉPUBLIQUE DU CONGO</textPath></text>
+      <path d="M 45,55 L 175,55 L 175,140 Q 175,190 110,215 Q 45,190 45,140 Z" fill="url(#shieldGold)" stroke="#5b4300" stroke-width="2.5"/>
+      <path d="M 45,120 Q 65,108 85,120 T 125,120 T 165,120 L 175,124 L 175,140 Q 175,190 110,215 Q 45,190 45,140 Z" fill="{CG_GREEN}" opacity="0.9"/>
+      <path d="M 45,108 Q 65,96 85,108 T 125,108 T 165,108 L 175,112 L 175,124 Q 65,108 45,120 Z" fill="{CG_GREEN}"/>
       <g transform="translate(110,90)">
         <ellipse cx="0" cy="0" rx="15" ry="11" fill="#B5121B"/>
         <circle cx="14" cy="-4" r="8" fill="#B5121B"/>
         <path d="M 20,-14 L 25,-30 L 29,-16 L 34,-28 L 33,-10 Z" fill="{CG_YELLOW}" stroke="#8a3a00" stroke-width="1"/>
-        <path d="M -14,4 L -22,18 M -6,8 L -10,22 M 6,8 L 8,22 M 14,4 L 20,16"
-              stroke="#8a3a00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M -14,4 L -22,18 M -6,8 L -10,22 M 6,8 L 8,22 M 14,4 L 20,16" stroke="#8a3a00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       </g>
-
-      <!-- éléphants stylisés (supports) -->
       <g fill="#2b2b2b">
         <ellipse cx="30" cy="150" rx="16" ry="11"/>
         <ellipse cx="190" cy="150" rx="16" ry="11"/>
       </g>
-
-      <!-- listel : devise -->
       <rect x="18" y="205" width="184" height="26" rx="13" fill="{CG_GOLD}" stroke="#5b4300" stroke-width="1.5"/>
-      <text x="110" y="222" font-size="11" font-weight="700" fill="#4a3400" text-anchor="middle"
-            letter-spacing="0.8" font-family="Georgia, 'Times New Roman', serif">
-        UNITÉ · TRAVAIL · PROGRÈS
-      </text>
+      <text x="110" y="222" font-size="11" font-weight="700" fill="#4a3400" text-anchor="middle" letter-spacing="0.8" font-family="Georgia, serif">UNITÉ · TRAVAIL · PROGRÈS</text>
     </svg>
-    """
+    """)
 
 
 # --------------------------------------------------------------------------- Badge ACPE (secours)
 def acpe_badge_svg(size: int = 80) -> str:
-    return f"""
+    return _clean(f"""
     <svg width="{size}" height="{size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="48" fill="#0B4F2C"/>
       <circle cx="50" cy="50" r="48" fill="none" stroke="{CG_GOLD}" stroke-width="2.5"/>
-      <text x="50" y="46" font-size="24" font-weight="800" fill="#FFFFFF" text-anchor="middle"
-            font-family="Arial, Helvetica, sans-serif">ACPE</text>
-      <text x="50" y="65" font-size="7.5" fill="{CG_YELLOW}" text-anchor="middle"
-            font-family="Arial, Helvetica, sans-serif" letter-spacing="0.5">CONGO</text>
+      <text x="50" y="46" font-size="24" font-weight="800" fill="#FFFFFF" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">ACPE</text>
+      <text x="50" y="65" font-size="7.5" fill="{CG_YELLOW}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" letter-spacing="0.5">CONGO</text>
     </svg>
-    """
+    """)
 
 
 def get_acpe_logo_html(height: int = 64) -> str:
@@ -164,35 +152,180 @@ def get_coat_of_arms_html(height: int = 92) -> str:
     return coat_of_arms_svg(height)
 
 
+def has_banner_image() -> bool:
+    return (ASSETS_DIR / "acpe_banner.png").exists()
+
+
+def has_map_image() -> bool:
+    return (ASSETS_DIR / "congo_map.png").exists()
+
+
+def get_banner_image_b64() -> Optional[str]:
+    path = ASSETS_DIR / "acpe_banner.png"
+    return _b64(path) if path.exists() else None
+
+
+def get_map_image_b64() -> Optional[str]:
+    path = ASSETS_DIR / "congo_map.png"
+    return _b64(path) if path.exists() else None
+
+
+# --------------------------------------------------------------------------- Signature : motif "cap boussole"
+def compass_tick_svg(size: int = 26) -> str:
+    """Petit repère de cap (arc pointillé + graduation), motif signature évoquant
+    l'« orientation » — cœur du sujet (mettre en relation, orienter un candidat
+    vers une offre). Réutilisé devant chaque titre de section."""
+    return _clean(f"""
+    <svg width="{size}" height="{size}" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="flex:none;">
+      <circle cx="20" cy="20" r="16" fill="none" stroke="{CG_GOLD}" stroke-width="1.4" stroke-dasharray="2.4 3.2" opacity="0.85"/>
+      <line x1="20" y1="4" x2="20" y2="10" stroke="{CG_GREEN}" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M20 14 L25 24 L20 21 L15 24 Z" fill="{CG_RED}"/>
+    </svg>
+    """)
+
+
+def section_title(text: str, subtitle: str = "") -> str:
+    """Titre de section stylisé avec le motif signature (remplace st.subheader
+    pour une identité visuelle cohérente sur tout le tableau de bord)."""
+    sub_html = f'<div class="cg-section-sub">{subtitle}</div>' if subtitle else ""
+    return _clean(f"""
+    <div class="cg-section-title">
+        {compass_tick_svg(24)}
+        <div>
+            <div class="cg-section-text">{text}</div>
+            {sub_html}
+        </div>
+    </div>
+    """)
+
+
+def render_section_title(text: str, subtitle: str = ""):
+    import streamlit as st
+    st.markdown(section_title(text, subtitle), unsafe_allow_html=True)
+
+
+def render_divider():
+    """Séparateur signature (arc pointillé) entre grandes sections."""
+    import streamlit as st
+    st.markdown(
+        _clean(f"""<div style="display:flex;align-items:center;gap:0.6rem;margin:1.6rem 0 1.3rem 0;">
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #e3ddc8 15%, #e3ddc8 85%, transparent);"></div>
+            {compass_tick_svg(20)}
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #e3ddc8 15%, #e3ddc8 85%, transparent);"></div>
+        </div>"""),
+        unsafe_allow_html=True,
+    )
+
+
+def render_banner_card():
+    """Bannière institutionnelle ACPE (si fournie) présentée dans une carte encadrée."""
+    import streamlit as st
+    b64 = get_banner_image_b64()
+    if not b64:
+        return
+    st.markdown(
+        _clean(f"""
+        <div class="cg-banner-card">
+            <img src="data:image/png;base64,{b64}" alt="Bannière ACPE" />
+        </div>
+        """),
+        unsafe_allow_html=True,
+    )
+
+
+def render_map_card(caption: str = "") -> bool:
+    """Affiche la carte du Congo dans une carte encadrée. Retourne True si affichée."""
+    import streamlit as st
+    b64 = get_map_image_b64()
+    if not b64:
+        return False
+    cap_html = f'<div class="cg-map-caption">{caption}</div>' if caption else ""
+    st.markdown(
+        _clean(f"""
+        <div class="cg-map-card">
+            <img src="data:image/png;base64,{b64}" alt="Carte de la République du Congo" />
+            {cap_html}
+        </div>
+        """),
+        unsafe_allow_html=True,
+    )
+    return True
+
+
+PLOTLY_COLORWAY = [CG_GREEN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
+
+
+def style_fig(fig):
+    """Applique un habillage graphique cohérent (police, couleurs, fond transparent)
+    à toute figure Plotly du tableau de bord."""
+    fig.update_layout(
+        font=dict(family="Inter, sans-serif", size=13, color=CG_INK),
+        title_font=dict(family="Space Grotesk, sans-serif", size=15, color=CG_INK),
+        colorway=PLOTLY_COLORWAY,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=40, l=10, r=10, b=10),
+        legend=dict(bgcolor="rgba(0,0,0,0)"),
+    )
+    fig.update_xaxes(gridcolor="#EFEAD9", zeroline=False)
+    fig.update_yaxes(gridcolor="#EFEAD9", zeroline=False)
+    return fig
+
+
 # --------------------------------------------------------------------------- CSS du thème
 def theme_css() -> str:
     return f"""
     <style>
+    @import url('{FONTS_IMPORT}');
+
     :root {{
         --cg-green: {CG_GREEN};
         --cg-yellow: {CG_YELLOW};
         --cg-red: {CG_RED};
         --cg-gold: {CG_GOLD};
+        --cg-river: {CG_RIVER};
+        --cg-ivory: {CG_IVORY};
+        --cg-ink: {CG_INK};
     }}
 
-    /* Bandeau tricolore en haut de la page */
+    /* ---------- Fond général & typographie ---------- */
+    .stApp {{
+        background:
+            radial-gradient(circle at 100% 0%, rgba(11,107,58,0.05) 0%, transparent 38%),
+            radial-gradient(circle at 0% 15%, rgba(242,194,48,0.07) 0%, transparent 32%),
+            var(--cg-ivory);
+    }}
+    html, body, [class*="css"] {{
+        font-family: 'Inter', -apple-system, sans-serif;
+        color: var(--cg-ink);
+    }}
+    h1, h2, h3, h4 {{
+        font-family: 'Space Grotesk', sans-serif !important;
+    }}
+    code, .stCode, [data-testid="stMetricValue"] {{
+        font-family: 'IBM Plex Mono', monospace !important;
+    }}
+
+    /* ---------- Bandeau tricolore + motif discret ---------- */
     .cg-topbar {{
-        height: 6px;
+        height: 7px;
         width: 100%;
         background: linear-gradient(90deg, var(--cg-green) 0 33%, var(--cg-yellow) 33% 66%, var(--cg-red) 66% 100%);
-        border-radius: 0 0 4px 4px;
-        margin-bottom: 1.1rem;
+        border-radius: 0 0 6px 6px;
+        margin-bottom: 1.3rem;
+        box-shadow: 0 2px 6px rgba(11,107,58,0.15);
     }}
 
-    /* En-tête */
+    /* ---------- En-tête ---------- */
     .cg-header {{
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1.5rem;
-        padding: 0.4rem 0 1.1rem 0;
-        border-bottom: 1px solid #e8e3d5;
-        margin-bottom: 1.4rem;
+        gap: 1.6rem;
+        padding: 0.6rem 1.4rem 1.3rem 1.4rem;
+        margin: 0 -1rem 1.6rem -1rem;
+        border-bottom: 1px solid #e8e1c8;
+        background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
     }}
     .cg-header-left, .cg-header-right {{
         flex: 0 0 auto;
@@ -205,48 +338,76 @@ def theme_css() -> str:
         text-align: center;
     }}
     .cg-title {{
-        font-size: 2.05rem;
-        font-weight: 800;
-        color: #1a2e22;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.15rem;
+        font-weight: 700;
+        color: var(--cg-ink);
         margin: 0;
         line-height: 1.15;
+        letter-spacing: -0.01em;
     }}
     .cg-subtitle {{
-        font-size: 0.95rem;
-        color: #5a5a5a;
+        font-size: 0.97rem;
+        color: #5a5a4c;
         margin-top: 0.35rem;
     }}
     .cg-badge-flag-row {{
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin-top: 0.3rem;
+        margin-top: 0.4rem;
         justify-content: center;
         font-size: 0.8rem;
-        color: #7a7a7a;
+        color: #7a7a6a;
         font-weight: 600;
         letter-spacing: 0.3px;
     }}
 
-    /* Cartes de métriques Streamlit */
+    /* ---------- Titres de section signature ---------- */
+    .cg-section-title {{
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin: 0.4rem 0 1rem 0;
+    }}
+    .cg-section-text {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.32rem;
+        font-weight: 700;
+        color: var(--cg-ink);
+    }}
+    .cg-section-sub {{
+        font-size: 0.86rem;
+        color: #7a7a6a;
+        margin-top: 0.1rem;
+    }}
+
+    /* ---------- Cartes de métriques Streamlit ---------- */
     div[data-testid="stMetric"] {{
         background: #ffffff;
-        border: 1px solid #e8e3d5;
+        border: 1px solid #eee7d3;
         border-top: 4px solid var(--cg-green);
-        border-radius: 10px;
-        padding: 1rem 1.1rem 0.8rem 1.1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        border-radius: 12px;
+        padding: 1.1rem 1.2rem 0.9rem 1.2rem;
+        box-shadow: 0 2px 10px rgba(22,36,28,0.06);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
     }}
-    div[data-testid="stMetric"]:nth-of-type(4n+2) {{ border-top-color: var(--cg-yellow); }}
+    div[data-testid="stMetric"]:hover {{
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22,36,28,0.10);
+    }}
+    div[data-testid="stMetric"]:nth-of-type(4n+2) {{ border-top-color: var(--cg-gold); }}
     div[data-testid="stMetric"]:nth-of-type(4n+3) {{ border-top-color: var(--cg-red); }}
-    div[data-testid="stMetric"]:nth-of-type(4n+4) {{ border-top-color: var(--cg-gold); }}
-    div[data-testid="stMetricLabel"] {{ color: #5a5a5a; font-weight: 600; }}
-    div[data-testid="stMetricValue"] {{ color: #1a2e22; }}
+    div[data-testid="stMetric"]:nth-of-type(4n+4) {{ border-top-color: var(--cg-river); }}
+    div[data-testid="stMetricLabel"] {{ color: #5a5a4c; font-weight: 600; font-size: 0.85rem; }}
+    div[data-testid="stMetricValue"] {{ color: var(--cg-ink); font-weight: 700; }}
 
-    /* Onglets */
+    /* ---------- Onglets ---------- */
     button[data-baseweb="tab"] {{
+        font-family: 'Space Grotesk', sans-serif;
         font-weight: 600;
         font-size: 0.98rem;
+        color: #6a6a5c;
     }}
     button[data-baseweb="tab"][aria-selected="true"] {{
         color: var(--cg-green) !important;
@@ -254,21 +415,81 @@ def theme_css() -> str:
     div[data-baseweb="tab-highlight"] {{
         background-color: var(--cg-green) !important;
         height: 3px !important;
+        border-radius: 3px;
+    }}
+    div[data-baseweb="tab-border"] {{ background-color: #eee7d3 !important; }}
+
+    /* ---------- Boutons ---------- */
+    .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1.5px solid var(--cg-green);
+        transition: all 0.15s ease;
+    }}
+    .stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] {{
+        background: var(--cg-green);
+        border-color: var(--cg-green);
+    }}
+    .stButton > button[kind="primary"]:hover, .stFormSubmitButton > button[kind="primary"]:hover {{
+        background: #094f2b;
+        border-color: #094f2b;
+    }}
+    .stDownloadButton > button {{
+        border-color: var(--cg-gold);
+        color: var(--cg-gold);
+    }}
+    .stDownloadButton > button:hover {{
+        background: var(--cg-gold);
+        color: white;
     }}
 
-    /* Sous-titres de section */
-    h3 {{
-        color: #1a2e22 !important;
-        border-left: 4px solid var(--cg-green);
-        padding-left: 0.6rem;
+    /* ---------- Cadres image (bannière ACPE / carte) ---------- */
+    .cg-banner-card {{
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #eee7d3;
+        box-shadow: 0 4px 14px rgba(22,36,28,0.08);
+        margin: 0.3rem 0 0.6rem 0;
+    }}
+    .cg-banner-card img {{ width: 100%; display: block; }}
+
+    .cg-map-card {{
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #eee7d3;
+        box-shadow: 0 4px 14px rgba(22,36,28,0.08);
+        background: white;
+        padding: 0.6rem 0.6rem 0.3rem 0.6rem;
+    }}
+    .cg-map-card img {{ width: 100%; display: block; border-radius: 8px; }}
+    .cg-map-caption {{
+        text-align: center;
+        font-size: 0.78rem;
+        color: #8a8a7a;
+        padding: 0.45rem 0 0.15rem 0;
+        font-style: italic;
     }}
 
-    /* Pied de page */
+    /* ---------- Dataframes ---------- */
+    div[data-testid="stDataFrame"] {{
+        border: 1px solid #eee7d3;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 6px rgba(22,36,28,0.05);
+    }}
+
+    /* ---------- Boîtes d'information ---------- */
+    div[data-testid="stAlertContentInfo"], div[data-testid="stNotification"] {{
+        border-radius: 10px;
+    }}
+
+    /* ---------- Pied de page ---------- */
     .cg-footer {{
         text-align: center;
-        color: #8a8a8a;
+        color: #9a9a8a;
         font-size: 0.82rem;
-        padding: 1.2rem 0 0.4rem 0;
+        padding: 1.4rem 0 0.6rem 0;
     }}
     .cg-footer-flag {{
         display: inline-flex;
@@ -286,7 +507,7 @@ def render_header():
     st.markdown(theme_css(), unsafe_allow_html=True)
     st.markdown('<div class="cg-topbar"></div>', unsafe_allow_html=True)
     st.markdown(
-        f"""
+        _clean(f"""
         <div class="cg-header">
             <div class="cg-header-left">{get_acpe_logo_html(64)}</div>
             <div class="cg-header-center">
@@ -296,7 +517,7 @@ def render_header():
             </div>
             <div class="cg-header-right">{get_coat_of_arms_html(92)}</div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -305,12 +526,12 @@ def render_footer():
     import streamlit as st
 
     st.markdown(
-        f"""
+        _clean(f"""
         <div class="cg-footer">
             <span class="cg-footer-flag">{flag_svg(22, 15)}</span>
             République du Congo — Prototype réalisé dans le cadre du Hackathon IndabaX Congo 2026 —
             moteur d'appariement TF-IDF + règles métier.
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
