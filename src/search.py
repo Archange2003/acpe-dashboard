@@ -20,21 +20,28 @@ from matching_engine import FRENCH_STOPWORDS
 
 
 class SearchEngine:
-    """Index TF-IDF réutilisable pour rechercher dans les offres ou les candidats."""
+    """Index TF-IDF réutilisable pour rechercher dans les offres ou les candidats.
 
-    def __init__(self):
-        self.dem = load_demandeurs()
-        self.off = load_offres()
+    Accepte des DataFrames déjà chargés (dem, off) pour éviter de dupliquer les
+    données en mémoire — important sur un serveur à ressources limitées, où
+    charger une seconde copie complète des 41 298 candidats a été identifié
+    comme cause de plantage mémoire (segmentation fault)."""
 
+    def __init__(self, dem: pd.DataFrame = None, off: pd.DataFrame = None):
+        self.dem = dem if dem is not None else load_demandeurs()
+        self.off = off if off is not None else load_offres()
+
+        # min_df=2 et max_features bornent la taille du vocabulaire (donc la mémoire),
+        # cohérent avec le moteur d'appariement principal (matching_engine.build_tfidf)
         self.vec_off = TfidfVectorizer(
             lowercase=True, stop_words=FRENCH_STOPWORDS, ngram_range=(1, 2),
-            min_df=1, max_df=0.7, sublinear_tf=True,
+            min_df=2, max_df=0.7, max_features=20000, sublinear_tf=True, dtype=np.float32,
         )
         self.X_off = self.vec_off.fit_transform(self.off["texte_offre"])
 
         self.vec_dem = TfidfVectorizer(
             lowercase=True, stop_words=FRENCH_STOPWORDS, ngram_range=(1, 2),
-            min_df=1, max_df=0.7, sublinear_tf=True,
+            min_df=2, max_df=0.7, max_features=20000, sublinear_tf=True, dtype=np.float32,
         )
         self.X_dem = self.vec_dem.fit_transform(self.dem["texte_profil"])
 
