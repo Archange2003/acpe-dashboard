@@ -965,15 +965,5 @@ def render_header():
 
 
 def render_footer():
-    import streamlit as st
-
-    st.markdown(
-        _clean(f"""
-        <div class="cg-footer">
-            <span class="cg-footer-flag">{flag_svg(22, 15)}</span>
-            République du Congo — Prototype réalisé dans le cadre du Hackathon IndabaX Congo 2026 —
-            moteur d'appariement TF-IDF + règles métier.
-        </div>
-        """),
-        unsafe_allow_html=True,
-    )
+    """Pied de page — actuellement désactivé (vide) à la demande de l'utilisateur."""
+    pass
