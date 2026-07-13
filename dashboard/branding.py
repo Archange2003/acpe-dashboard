@@ -433,10 +433,15 @@ def theme_css() -> str:
 
     /* ---------- Fond général & typographie ---------- */
     .stApp {{
-        background-color: var(--cg-ivory);
-        background-image: radial-gradient(circle, rgba(11,107,58,0.10) 1px, transparent 1px);
-        background-size: 24px 24px;
+        background-color: #F3F1E8;
+        background-image:
+            linear-gradient(rgba(11,107,58,0.09) 1.5px, transparent 1.5px),
+            linear-gradient(90deg, rgba(11,107,58,0.09) 1.5px, transparent 1.5px);
+        background-size: 34px 34px;
         background-attachment: fixed;
+    }}
+    [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMainBlockContainer"] {{
+        background: transparent !important;
     }}
     html, body, [class*="css"] {{
         font-family: 'Inter', -apple-system, sans-serif;
