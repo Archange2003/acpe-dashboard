@@ -59,7 +59,7 @@ def get_recommendations(_dem, _off):
 
 @st.cache_resource(show_spinner="Indexation de la recherche...")
 def get_search_engine():
-    return SearchEngine()
+    return SearchEngine(dem, off)
 
 
 dem, off, gt = get_data()
