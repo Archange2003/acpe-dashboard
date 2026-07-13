@@ -864,6 +864,52 @@ def theme_css() -> str:
         margin-top: 0.15rem;
     }}
 
+    /* ---------- Lisibilité renforcée : libellés, légendes, tableaux ---------- */
+    [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {{
+        font-weight: 700 !important;
+        color: var(--cg-ink) !important;
+        font-size: 0.95rem !important;
+    }}
+    [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {{
+        color: var(--cg-text-muted) !important;
+        font-weight: 500 !important;
+    }}
+    [data-testid="stMarkdownContainer"] p {{
+        color: var(--cg-ink);
+        font-weight: 450;
+        line-height: 1.55;
+    }}
+    [data-testid="stMarkdownContainer"] strong {{
+        font-weight: 700;
+        color: var(--cg-ink);
+    }}
+    /* Radios / cases à cocher */
+    [data-testid="stRadio"] label, [data-testid="stCheckbox"] label {{
+        font-weight: 600 !important;
+    }}
+    /* Tableaux (dataframes) : en-têtes et cellules bien lisibles */
+    [data-testid="stDataFrame"] [role="columnheader"] {{
+        font-weight: 700 !important;
+        color: var(--cg-ink) !important;
+        background: rgba(108,92,231,0.10) !important;
+    }}
+    [data-testid="stDataFrame"] [role="gridcell"] {{
+        font-weight: 500 !important;
+        color: var(--cg-ink) !important;
+    }}
+    /* Champs de saisie (texte, nombre, zone de texte) */
+    [data-testid="stTextInput"] input, [data-testid="stTextArea"] textarea,
+    [data-testid="stNumberInput"] input, [data-baseweb="select"] * {{
+        color: var(--cg-ink) !important;
+        font-weight: 500 !important;
+    }}
+    /* Boîtes d'alerte (info / warning / erreur) */
+    [data-testid="stAlertContentInfo"] p, [data-testid="stAlertContentWarning"] p,
+    [data-testid="stAlertContentError"] p, [data-testid="stAlertContentSuccess"] p {{
+        font-weight: 600 !important;
+    }}
+    /* Onglets internes (sous-onglets candidat/offre etc.) déjà couverts par button[data-baseweb=tab] */
+
     /* ---------- Pied de page ---------- */
     .cg-footer {{
         text-align: center;
