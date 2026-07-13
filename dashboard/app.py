@@ -27,7 +27,7 @@ from branding import (  # noqa: E402
     render_header, render_footer, render_section_title, render_divider,
     render_banner_card, render_map_card, has_map_image, style_fig, gradient_colors,
     render_hero, render_kpi_row, render_card_open, render_page_intro,
-    CG_GREEN, CG_GOLD, CG_RED, CG_RIVER,
+    CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, CG_BROWN, CG_OCHRE, CG_TERRA,
 )
 
 st.set_page_config(page_title="ACPE — Tableau de bord d'appariement", layout="wide", page_icon="🧭")
@@ -91,10 +91,10 @@ with tab_overview:
     n_secteurs = off[off["secteur"] != ""]["secteur"].nunique()
     taux_moyen = reco[reco["rank"] == 1]["score"].mean() if reco is not None else None
     render_kpi_row([
-        {"icon": "people", "value": f"{len(dem):,}".replace(",", " "), "label": "Candidats enregistrés", "accent": CG_GREEN},
+        {"icon": "people", "value": f"{len(dem):,}".replace(",", " "), "label": "Candidats enregistrés", "accent": CG_BROWN},
         {"icon": "briefcase", "value": f"{len(off):,}".replace(",", " "), "label": "Offres d'emploi actives", "accent": CG_GOLD},
-        {"icon": "building", "value": str(n_secteurs), "label": "Secteurs représentés", "accent": CG_RIVER},
-        {"icon": "target", "value": f"{taux_moyen:.0%}" if taux_moyen is not None else "—", "label": "Compatibilité moyenne (meilleure offre)", "accent": CG_RED},
+        {"icon": "building", "value": str(n_secteurs), "label": "Secteurs représentés", "accent": CG_OCHRE},
+        {"icon": "target", "value": f"{taux_moyen:.0%}" if taux_moyen is not None else "—", "label": "Compatibilité moyenne (meilleure offre)", "accent": CG_TERRA},
     ])
 
     render_divider()
@@ -108,7 +108,7 @@ with tab_overview:
             fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "secteur": "Secteur d'activité"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
-            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#d9ecdf", CG_GREEN))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#e7dccb", CG_BROWN))
             st.plotly_chart(style_fig(fig, "Top 10 des secteurs par nombre d'offres"), use_container_width=True)
 
     with col2:
@@ -133,7 +133,7 @@ with tab_overview:
                 render_map_card("Répartition des offres d'emploi sur le territoire national")
             else:
                 fig = px.pie(lieu_counts, names="lieu", values="nombre", hole=0.5,
-                             color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, "#6FA287"],
+                             color_discrete_sequence=[CG_BROWN, CG_GOLD, CG_TERRA, CG_OCHRE, CG_RIVER],
                              labels={"lieu": "Ville", "nombre": "Nombre d'offres"})
                 fig.update_layout(height=360)
                 st.plotly_chart(style_fig(fig, "Part des offres par ville"), use_container_width=True)
@@ -145,7 +145,7 @@ with tab_overview:
             fig = px.bar(lieu_sorted, x="nombre", y="lieu", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "lieu": "Ville"})
             fig.update_layout(height=210, margin=dict(t=5, l=5, r=5, b=5))
-            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#d9ecdf", CG_GREEN))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#e7dccb", CG_BROWN))
             st.plotly_chart(style_fig(fig, "Classement des villes par nombre d'offres"), use_container_width=True)
 
         with st.container(border=True):
@@ -153,7 +153,7 @@ with tab_overview:
             obj_counts = dem["Objectif"].value_counts().reset_index()
             obj_counts.columns = ["objectif", "nombre"]
             fig = px.pie(obj_counts, names="objectif", values="nombre", hole=0.55,
-                         color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED],
+                         color_discrete_sequence=[CG_BROWN, CG_GOLD, CG_TERRA],
                          labels={"objectif": "Objectif recherché", "nombre": "Nombre de candidats"})
             fig.update_layout(height=250, margin=dict(t=5, l=5, r=5, b=5))
             st.plotly_chart(style_fig(fig, "Répartition par objectif (emploi / stage / formation)"), use_container_width=True)
@@ -176,7 +176,7 @@ with tab_reco:
             c2.metric("Score moyen (Top-1)", f"{reco[reco['rank']==1]['score'].mean():.1%}")
             c3.metric("Score médian (Top-1)", f"{reco[reco['rank']==1]['score'].median():.1%}")
 
-            fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_GREEN],
+            fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_BROWN],
                                labels={"score": "Score de compatibilité (meilleure offre)"})
             fig.update_traces(marker_line_width=0)
             fig.update_layout(bargap=0.05, yaxis_title="Nombre de candidats")
@@ -200,7 +200,7 @@ with tab_search:
     render_page_intro(
         "search", "Recherche intelligente",
         "Bonus 1 — interrogez les offres ou les candidats en langage naturel, sans mot-clé exact.",
-        accent=CG_RIVER,
+        accent=CG_OCHRE,
     )
     with st.container(border=True):
         render_card_open("Votre requête", "Ex : « développeur Python à Brazzaville », « comptable avec mobilité nationale »", icon="search")
@@ -220,7 +220,7 @@ with tab_skillgap:
     render_page_intro(
         "puzzle", "Écarts de compétences",
         "Bonus 2 — pour une paire candidat/offre, identifiez les compétences déjà couvertes et celles qui manquent.",
-        accent=CG_RED,
+        accent=CG_TERRA,
     )
     with st.container(border=True):
         render_card_open("Analyse de compatibilité", "Disponible pour les offres issues du fichier d'extension (compétences détaillées).", icon="puzzle")

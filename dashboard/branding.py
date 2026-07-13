@@ -30,14 +30,20 @@ from typing import Optional
 
 ASSETS_DIR = Path(__file__).parent / "assets"
 
-# Palette — couleurs institutionnelles du drapeau congolais + tons complémentaires
-CG_GREEN = "#0B6B3A"      # foret — vert profond, couleur primaire
-CG_YELLOW = "#F2C230"     # savane — jaune/or du drapeau, accent chaleureux
-CG_RED = "#B7241D"        # braise — rouge du drapeau, accent fort (usage parcimonieux)
+# Couleurs du drapeau national (usage réservé : drapeau, armoiries — ne pas
+# utiliser ailleurs dans le thème, pour bien les distinguer de l'identité du site)
+CG_GREEN = "#0B6B3A"      # vert du drapeau
+CG_YELLOW = "#F2C230"     # jaune du drapeau
+CG_RED = "#B7241D"        # rouge du drapeau
+
+# Palette principale du tableau de bord — tons chauds (marron / ocre / terre)
+CG_BROWN = "#6E4423"      # marron profond — couleur principale du thème (onglets, boutons, accents)
+CG_OCHRE = "#C8892E"      # ocre chaud — accent secondaire
+CG_TERRA = "#A8501F"      # terre cuite — accent tertiaire
 CG_GOLD = "#B8862B"       # or institutionnel — armoiries, devise
-CG_RIVER = "#1F4B57"      # fleuve — bleu-vert profond, ton froid complémentaire (graphiques)
-CG_IVORY = "#FBFAF6"      # ivoire — fond de page, très légèrement chaud
-CG_INK = "#16241C"        # encre — texte principal
+CG_RIVER = "#5A4632"      # brun-gris profond, ton neutre complémentaire (graphiques)
+CG_IVORY = "#F7F1E4"      # fond de page — sable clair, chaud
+CG_INK = "#2B2016"        # encre — texte principal (brun très sombre)
 
 FONTS_IMPORT = (
     "https://fonts.googleapis.com/css2?"
@@ -178,7 +184,7 @@ def compass_tick_svg(size: int = 26) -> str:
     return _clean(f"""
     <svg width="{size}" height="{size}" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="flex:none;">
       <circle cx="20" cy="20" r="16" fill="none" stroke="{CG_GOLD}" stroke-width="1.4" stroke-dasharray="2.4 3.2" opacity="0.85"/>
-      <line x1="20" y1="4" x2="20" y2="10" stroke="{CG_GREEN}" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="20" y1="4" x2="20" y2="10" stroke="{CG_BROWN}" stroke-width="2.2" stroke-linecap="round"/>
       <path d="M20 14 L25 24 L20 21 L15 24 Z" fill="{CG_RED}"/>
     </svg>
     """)
@@ -257,7 +263,7 @@ def render_page_intro(icon: str, title: str, subtitle: str, accent: str = None):
     chaque onglet secondaire, pour une cohérence visuelle avec le bandeau hero
     de la page d'accueil."""
     import streamlit as st
-    accent = accent or CG_GREEN
+    accent = accent or CG_BROWN
     st.markdown(
         _clean(f"""
         <div class="cg-page-intro" style="--intro-accent:{accent};">
@@ -296,7 +302,7 @@ def gradient_colors(values, color_from: str, color_to: str) -> list:
     return out
 
 
-PLOTLY_COLORWAY = [CG_GREEN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
+PLOTLY_COLORWAY = [CG_BROWN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
 
 
 # --------------------------------------------------------------------------- Jeu d'icônes (style trait, cohérent)
@@ -315,7 +321,7 @@ _ICON_PATHS = {
 
 def icon_svg(name: str, size: int = 22, color: str = None, stroke_width: float = 1.8) -> str:
     """Icône ligne (style Feather), monochrome, cohérente sur tout le tableau de bord."""
-    color = color or CG_GREEN
+    color = color or CG_BROWN
     body = _ICON_PATHS.get(name, _ICON_PATHS["target"])
     return _clean(f"""
     <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">{body}</svg>
@@ -359,7 +365,7 @@ def render_kpi_row(items: list):
     import streamlit as st
     cards = []
     for it in items:
-        accent = it.get("accent", CG_GREEN)
+        accent = it.get("accent", CG_BROWN)
         cards.append(f"""
         <div class="cg-kpi-card" style="--kpi-accent:{accent};">
             <div class="cg-kpi-icon">{icon_svg(it["icon"], 26, accent)}</div>
@@ -377,7 +383,7 @@ def render_card_open(title: str = "", subtitle: str = "", icon: str = None):
     """Affiche l'en-tête stylisé d'une carte. À utiliser en tout début d'un
     st.container(border=True) pour un rendu de type carte premium."""
     import streamlit as st
-    icon_html = f'<div class="cg-card-icon">{icon_svg(icon, 20, CG_GREEN)}</div>' if icon else ""
+    icon_html = f'<div class="cg-card-icon">{icon_svg(icon, 20, CG_BROWN)}</div>' if icon else ""
     if title:
         st.markdown(
             _clean(f'<div class="cg-card-header">{icon_html}<div><div class="cg-card-title">{title}</div><div class="cg-card-subtitle">{subtitle}</div></div></div>'),
@@ -429,16 +435,14 @@ def theme_css() -> str:
         --cg-river: {CG_RIVER};
         --cg-ivory: {CG_IVORY};
         --cg-ink: {CG_INK};
+        --cg-primary: {CG_BROWN};
+        --cg-ochre: {CG_OCHRE};
+        --cg-terra: {CG_TERRA};
     }}
 
     /* ---------- Fond général & typographie ---------- */
     .stApp {{
-        background-color: #F3F1E8;
-        background-image:
-            linear-gradient(rgba(11,107,58,0.09) 1.5px, transparent 1.5px),
-            linear-gradient(90deg, rgba(11,107,58,0.09) 1.5px, transparent 1.5px);
-        background-size: 34px 34px;
-        background-attachment: fixed;
+        background-color: var(--cg-ivory);
     }}
     [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMainBlockContainer"] {{
         background: transparent !important;
@@ -556,7 +560,7 @@ def theme_css() -> str:
     div[data-testid="stMetric"] {{
         background: #ffffff;
         border: 1px solid #eee7d3;
-        border-top: 4px solid var(--cg-green);
+        border-top: 4px solid var(--cg-primary);
         border-radius: 12px;
         padding: 1.1rem 1.2rem 0.9rem 1.2rem;
         box-shadow: 0 2px 10px rgba(22,36,28,0.06);
@@ -580,10 +584,10 @@ def theme_css() -> str:
         color: #6a6a5c;
     }}
     button[data-baseweb="tab"][aria-selected="true"] {{
-        color: var(--cg-green) !important;
+        color: var(--cg-primary) !important;
     }}
     div[data-baseweb="tab-highlight"] {{
-        background-color: var(--cg-green) !important;
+        background-color: var(--cg-primary) !important;
         height: 3px !important;
         border-radius: 3px;
     }}
@@ -594,16 +598,16 @@ def theme_css() -> str:
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 600;
         border-radius: 8px;
-        border: 1.5px solid var(--cg-green);
+        border: 1.5px solid var(--cg-primary);
         transition: all 0.15s ease;
     }}
     .stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] {{
-        background: var(--cg-green);
-        border-color: var(--cg-green);
+        background: var(--cg-primary);
+        border-color: var(--cg-primary);
     }}
     .stButton > button[kind="primary"]:hover, .stFormSubmitButton > button[kind="primary"]:hover {{
-        background: #094f2b;
-        border-color: #094f2b;
+        background: #4e2f17;
+        border-color: #4e2f17;
     }}
     .stDownloadButton > button {{
         border-color: var(--cg-gold);
@@ -674,8 +678,8 @@ def theme_css() -> str:
         border-radius: 20px;
         padding: 2.4rem 2.6rem;
         margin-bottom: 1.6rem;
-        background: linear-gradient(120deg, {CG_GREEN} 0%, #0e5c33 45%, {CG_RIVER} 100%);
-        box-shadow: 0 10px 30px rgba(11,107,58,0.22);
+        background: linear-gradient(120deg, {CG_BROWN} 0%, #8a5a2e 45%, {CG_TERRA} 100%);
+        box-shadow: 0 10px 30px rgba(110,68,35,0.25);
     }}
     .cg-hero-pattern {{
         position: absolute;
@@ -754,7 +758,7 @@ def theme_css() -> str:
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 3px;
-        background: var(--kpi-accent, {CG_GREEN});
+        background: var(--kpi-accent, {CG_BROWN});
     }}
     .cg-kpi-card:hover {{
         transform: translateY(-3px);
@@ -767,7 +771,7 @@ def theme_css() -> str:
         display: flex;
         align-items: center;
         justify-content: center;
-        background: color-mix(in srgb, var(--kpi-accent, {CG_GREEN}) 12%, white);
+        background: color-mix(in srgb, var(--kpi-accent, {CG_BROWN}) 12%, white);
         margin-bottom: 0.7rem;
     }}
     .cg-kpi-value {{
@@ -823,7 +827,7 @@ def theme_css() -> str:
         gap: 1rem;
         background: linear-gradient(135deg, #ffffff 0%, #f7f5ee 100%);
         border: 1px solid #eee7d3;
-        border-left: 5px solid var(--intro-accent, {CG_GREEN});
+        border-left: 5px solid var(--intro-accent, {CG_BROWN});
         border-radius: 14px;
         padding: 1.1rem 1.4rem;
         margin-bottom: 1.4rem;
@@ -833,7 +837,7 @@ def theme_css() -> str:
         width: 48px;
         height: 48px;
         border-radius: 12px;
-        background: color-mix(in srgb, var(--intro-accent, {CG_GREEN}) 14%, white);
+        background: color-mix(in srgb, var(--intro-accent, {CG_BROWN}) 14%, white);
         display: flex;
         align-items: center;
         justify-content: center;
