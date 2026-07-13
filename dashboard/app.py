@@ -21,7 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__f
 
 from data_prep import load_demandeurs, load_offres, load_ground_truth  # noqa: E402
 from run_matching import generate_recommendations  # noqa: E402
-from search import SearchEngine  # noqa: E402
+from search import OffresSearchIndex, CandidatsSearchIndex  # noqa: E402
 from skill_gap import skill_gap  # noqa: E402
 from branding import (  # noqa: E402
     render_header, render_footer, render_section_title, render_divider,
@@ -57,9 +57,14 @@ def get_recommendations(_dem, _off):
     return generate_recommendations(_dem, _off, top_k=10)
 
 
-@st.cache_resource(show_spinner="Indexation de la recherche...")
-def get_search_engine():
-    return SearchEngine(dem, off)
+@st.cache_resource(show_spinner="Indexation des offres...")
+def get_offres_index():
+    return OffresSearchIndex(off)
+
+
+@st.cache_resource(show_spinner="Indexation des candidats...")
+def get_candidats_index():
+    return CandidatsSearchIndex(dem)
 
 
 dem, off, gt = get_data()
@@ -206,12 +211,13 @@ if page == PAGES[2]:
         mode = st.radio("Rechercher parmi :", ["Offres", "Candidats"], horizontal=True)
         query = st.text_input("Votre requête")
         if query:
-            engine = get_search_engine()
             if mode == "Offres":
-                results = engine.search_offres(query, top_k=15)
+                index = get_offres_index()
+                results = index.search(query, top_k=15)
                 st.dataframe(results, use_container_width=True, hide_index=True)
             else:
-                results = engine.search_candidats(query, top_k=15)
+                index = get_candidats_index()
+                results = index.search(query, top_k=15)
                 st.dataframe(results, use_container_width=True, hide_index=True)
 
 # ----------------------------------------------------------------- Skill gap (Bonus 2)
