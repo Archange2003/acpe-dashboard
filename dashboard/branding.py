@@ -255,6 +255,92 @@ def render_map_card(caption: str = "") -> bool:
 PLOTLY_COLORWAY = [CG_GREEN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
 
 
+# --------------------------------------------------------------------------- Jeu d'icônes (style trait, cohérent)
+_ICON_PATHS = {
+    "people": '<path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M16.5 6a2.5 2.5 0 1 1 0 5"/><path d="M18 14c2.8.4 5 2.3 5 5.5"/>',
+    "briefcase": '<rect x="2.5" y="7" width="19" height="12.5" rx="2"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7"/><path d="M2.5 13h19"/>',
+    "building": '<rect x="4" y="3" width="10" height="18" rx="1"/><rect x="15" y="9" width="6" height="12" rx="1"/><path d="M7.5 7h1M11.5 7h1M7.5 11h1M11.5 11h1M7.5 15h1M11.5 15h1"/>',
+    "target": '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    "search": '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.7-4.7"/>',
+    "puzzle": '<path d="M8 3.5h4a1.5 1.5 0 0 1 0 3 1.5 1.5 0 0 0 0 3H16a2 2 0 0 1 2 2v3.5a1.5 1.5 0 0 1-3 0 1.5 1.5 0 0 0-3 0v.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3.5a1.5 1.5 0 0 0 3 0 1.5 1.5 0 0 1 3 0H12a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Z"/>',
+    "bolt": '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+    "map": '<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z"/><path d="M9 4v13M15 6.5v13"/>',
+    "chart": '<path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/>',
+}
+
+
+def icon_svg(name: str, size: int = 22, color: str = None, stroke_width: float = 1.8) -> str:
+    """Icône ligne (style Feather), monochrome, cohérente sur tout le tableau de bord."""
+    color = color or CG_GREEN
+    body = _ICON_PATHS.get(name, _ICON_PATHS["target"])
+    return _clean(f"""
+    <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">{body}</svg>
+    """)
+
+
+# --------------------------------------------------------------------------- Bandeau "hero"
+def render_hero(headline: str, subheadline: str, chips: list = None):
+    """Grand bandeau d'ouverture (dégradé aux couleurs institutionnelles) pour la page
+    d'accueil du tableau de bord — remplace un simple titre par un vrai point d'entrée
+    éditorial, comme sur les portails d'une grande institution."""
+    import streamlit as st
+    chips_html = ""
+    if chips:
+        items = "".join(
+            f'<div class="cg-hero-chip">{icon_svg(ic, 16, "#FFFFFF")}<span>{txt}</span></div>'
+            for ic, txt in chips
+        )
+        chips_html = f'<div class="cg-hero-chips">{items}</div>'
+    st.markdown(
+        _clean(f"""
+        <div class="cg-hero">
+            <div class="cg-hero-pattern"></div>
+            <div class="cg-hero-content">
+                <div class="cg-hero-eyebrow">{compass_tick_svg(18)}<span>ACPE · INTELLIGENCE ARTIFICIELLE AU SERVICE DE L'EMPLOI</span></div>
+                <div class="cg-hero-headline">{headline}</div>
+                <div class="cg-hero-sub">{subheadline}</div>
+                {chips_html}
+            </div>
+        </div>
+        """),
+        unsafe_allow_html=True,
+    )
+
+
+# --------------------------------------------------------------------------- Cartes KPI sur-mesure
+def render_kpi_row(items: list):
+    """Ligne de cartes KPI entièrement personnalisées (icône + valeur + libellé),
+    plus riche visuellement que st.metric natif. items = liste de dicts avec
+    keys: icon, value, label, accent (couleur optionnelle)."""
+    import streamlit as st
+    cards = []
+    for it in items:
+        accent = it.get("accent", CG_GREEN)
+        cards.append(f"""
+        <div class="cg-kpi-card" style="--kpi-accent:{accent};">
+            <div class="cg-kpi-icon">{icon_svg(it["icon"], 26, accent)}</div>
+            <div class="cg-kpi-value">{it["value"]}</div>
+            <div class="cg-kpi-label">{it["label"]}</div>
+        </div>
+        """)
+    st.markdown(
+        _clean(f'<div class="cg-kpi-row">{"".join(cards)}</div>'),
+        unsafe_allow_html=True,
+    )
+
+
+def render_card_open(title: str = "", subtitle: str = "", icon: str = None):
+    """Affiche l'en-tête stylisé d'une carte. À utiliser en tout début d'un
+    st.container(border=True) pour un rendu de type carte premium."""
+    import streamlit as st
+    icon_html = f'<div class="cg-card-icon">{icon_svg(icon, 20, CG_GREEN)}</div>' if icon else ""
+    if title:
+        st.markdown(
+            _clean(f'<div class="cg-card-header">{icon_html}<div><div class="cg-card-title">{title}</div><div class="cg-card-subtitle">{subtitle}</div></div></div>'),
+            unsafe_allow_html=True,
+        )
+
+
 def style_fig(fig):
     """Applique un habillage graphique cohérent (police, couleurs, fond transparent)
     à toute figure Plotly du tableau de bord."""
@@ -482,6 +568,168 @@ def theme_css() -> str:
     /* ---------- Boîtes d'information ---------- */
     div[data-testid="stAlertContentInfo"], div[data-testid="stNotification"] {{
         border-radius: 10px;
+    }}
+
+    /* ---------- Conteneurs à bordure (st.container(border=True)) : rendu carte premium ---------- */
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
+        border-radius: 14px !important;
+    }}
+    div[data-testid="stVerticalBlockBorderWrapper"] > div {{
+        border-radius: 14px !important;
+        box-shadow: 0 3px 14px rgba(22,36,28,0.06);
+        background: #ffffff;
+    }}
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] {{
+        gap: 0.6rem;
+    }}
+
+    /* ---------- Bandeau hero (page d'accueil) ---------- */
+    .cg-hero {{
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        padding: 2.4rem 2.6rem;
+        margin-bottom: 1.6rem;
+        background: linear-gradient(120deg, {CG_GREEN} 0%, #0e5c33 45%, {CG_RIVER} 100%);
+        box-shadow: 0 10px 30px rgba(11,107,58,0.22);
+    }}
+    .cg-hero-pattern {{
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image: radial-gradient(circle at 20% 20%, white 1.5px, transparent 1.5px),
+                          radial-gradient(circle at 60% 70%, white 1.5px, transparent 1.5px),
+                          radial-gradient(circle at 90% 30%, white 1.5px, transparent 1.5px);
+        background-size: 60px 60px, 90px 90px, 75px 75px;
+    }}
+    .cg-hero-content {{ position: relative; z-index: 1; }}
+    .cg-hero-eyebrow {{
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: {CG_YELLOW};
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.9rem;
+    }}
+    .cg-hero-headline {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.3rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.2;
+        max-width: 780px;
+    }}
+    .cg-hero-sub {{
+        font-size: 1.02rem;
+        color: rgba(255,255,255,0.88);
+        margin-top: 0.8rem;
+        max-width: 680px;
+        line-height: 1.5;
+    }}
+    .cg-hero-chips {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 1.4rem;
+    }}
+    .cg-hero-chip {{
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.28);
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        backdrop-filter: blur(2px);
+    }}
+
+    /* ---------- Cartes KPI sur-mesure ---------- */
+    .cg-kpi-row {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 0.4rem;
+    }}
+    .cg-kpi-card {{
+        background: #ffffff;
+        border: 1px solid #eee7d3;
+        border-radius: 14px;
+        padding: 1.2rem 1.3rem;
+        box-shadow: 0 2px 10px rgba(22,36,28,0.05);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
+        overflow: hidden;
+    }}
+    .cg-kpi-card::before {{
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--kpi-accent, {CG_GREEN});
+    }}
+    .cg-kpi-card:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 10px 22px rgba(22,36,28,0.11);
+    }}
+    .cg-kpi-icon {{
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--kpi-accent, {CG_GREEN}) 12%, white);
+        margin-bottom: 0.7rem;
+    }}
+    .cg-kpi-value {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: {CG_INK};
+        line-height: 1.1;
+    }}
+    .cg-kpi-label {{
+        font-size: 0.82rem;
+        color: #7a7a6a;
+        margin-top: 0.3rem;
+        font-weight: 500;
+    }}
+    @media (max-width: 900px) {{
+        .cg-kpi-row {{ grid-template-columns: repeat(2, 1fr); }}
+        .cg-hero-headline {{ font-size: 1.7rem; }}
+    }}
+
+    /* ---------- En-têtes de carte (icône + titre + sous-titre) ---------- */
+    .cg-card-header {{
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        margin-bottom: 0.6rem;
+    }}
+    .cg-card-icon {{
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: #eaf3ee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+    }}
+    .cg-card-title {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: {CG_INK};
+    }}
+    .cg-card-subtitle {{
+        font-size: 0.8rem;
+        color: #8a8a7a;
     }}
 
     /* ---------- Pied de page ---------- */
