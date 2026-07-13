@@ -36,20 +36,20 @@ CG_GREEN = "#0B6B3A"      # vert du drapeau
 CG_YELLOW = "#F2C230"     # jaune du drapeau
 CG_RED = "#B7241D"        # rouge du drapeau
 
-# Palette principale du tableau de bord — thème sombre, accents vifs
+# Palette principale du tableau de bord — thème clair, fond bleu très clair, accents vifs
 CG_BROWN = "#6C5CE7"      # violet — couleur principale du thème (onglets, boutons, accents)
-CG_OCHRE = "#2DD4BF"      # turquoise — accent secondaire
-CG_TERRA = "#F5A623"      # orange — accent tertiaire
-CG_GOLD = "#F2C230"       # or/jaune — armoiries, devise (reste doré, lisible sur fond sombre)
-CG_RIVER = "#3B82F6"      # bleu — accent complémentaire (graphiques)
-CG_IVORY = "#0F1420"      # fond de page — bleu nuit très sombre
-CG_INK = "#F1F5F9"        # texte principal — blanc cassé (lisible sur fond sombre)
+CG_OCHRE = "#17A398"      # turquoise (assombri pour rester lisible sur fond clair) — accent secondaire
+CG_TERRA = "#E08E0B"      # orange (assombri pour rester lisible sur fond clair) — accent tertiaire
+CG_GOLD = "#B8862B"       # or institutionnel — armoiries, devise
+CG_RIVER = "#2563EB"      # bleu — accent complémentaire (graphiques)
+CG_IVORY = "#E9F2FC"      # fond de page — bleu très clair
+CG_INK = "#152238"        # texte principal — bleu-nuit très sombre (lisible sur fond clair)
 
-# Couleurs additionnelles spécifiques au thème sombre
-CG_CARD = "#171D2E"       # fond des cartes
-CG_CARD_BORDER = "#28304A"  # bordure des cartes
-CG_TEXT_MUTED = "#94A3B8"   # texte secondaire (gris-bleu clair)
-CG_GRID = "#232B41"          # lignes de grille des graphiques
+# Couleurs additionnelles du thème
+CG_CARD = "#FFFFFF"          # fond des cartes — blanc
+CG_CARD_BORDER = "#D6E4F3"   # bordure des cartes — bleu très pâle
+CG_TEXT_MUTED = "#57708C"    # texte secondaire (bleu-gris moyen)
+CG_GRID = "#DCE7F5"          # lignes de grille des graphiques
 
 FONTS_IMPORT = (
     "https://fonts.googleapis.com/css2?"
@@ -221,9 +221,9 @@ def render_divider():
     import streamlit as st
     st.markdown(
         _clean(f"""<div style="display:flex;align-items:center;gap:0.6rem;margin:1.6rem 0 1.3rem 0;">
-            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #28304A 15%, #28304A 85%, transparent);"></div>
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #D6E4F3 15%, #D6E4F3 85%, transparent);"></div>
             {compass_tick_svg(20)}
-            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #28304A 15%, #28304A 85%, transparent);"></div>
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #D6E4F3 15%, #D6E4F3 85%, transparent);"></div>
         </div>"""),
         unsafe_allow_html=True,
     )
@@ -413,15 +413,15 @@ def style_fig(fig, title: str = ""):
         coloraxis_showscale=False,
     )
     fig.update_xaxes(
-        gridcolor="#232B41", zeroline=False,
+        gridcolor="#DCE7F5", zeroline=False,
         title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
-        tickfont=dict(size=11.5, color="#B8C2D6"),
+        tickfont=dict(size=11.5, color="#57708C"),
         title_standoff=10,
     )
     fig.update_yaxes(
-        gridcolor="#232B41", zeroline=False,
+        gridcolor="#DCE7F5", zeroline=False,
         title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
-        tickfont=dict(size=11.5, color="#B8C2D6"),
+        tickfont=dict(size=11.5, color="#57708C"),
         title_standoff=10,
     )
     return fig
@@ -475,7 +475,7 @@ def theme_css() -> str:
         margin: 0.4rem 0 1.6rem 0;
         background: var(--cg-card);
         border: 1px solid var(--cg-card-border);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+        box-shadow: 0 4px 16px rgba(21,34,56,0.08);
     }}
     .cg-header-accent {{
         height: 6px;
@@ -572,12 +572,12 @@ def theme_css() -> str:
         border-top: 4px solid var(--cg-primary);
         border-radius: 12px;
         padding: 1.1rem 1.2rem 0.9rem 1.2rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        box-shadow: 0 2px 10px rgba(21,34,56,0.07);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }}
     div[data-testid="stMetric"]:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+        box-shadow: 0 6px 16px rgba(21,34,56,0.12);
     }}
     div[data-testid="stMetric"]:nth-of-type(4n+2) {{ border-top-color: var(--cg-gold); }}
     div[data-testid="stMetric"]:nth-of-type(4n+3) {{ border-top-color: var(--cg-red); }}
@@ -632,7 +632,7 @@ def theme_css() -> str:
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid var(--cg-card-border);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        box-shadow: 0 4px 14px rgba(21,34,56,0.08);
         margin: 0.3rem 0 0.6rem 0;
     }}
     .cg-banner-card img {{ width: 100%; display: block; }}
@@ -641,7 +641,7 @@ def theme_css() -> str:
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid var(--cg-card-border);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        box-shadow: 0 4px 14px rgba(21,34,56,0.08);
         background: var(--cg-card);
         padding: 0.6rem 0.6rem 0.3rem 0.6rem;
     }}
@@ -659,7 +659,7 @@ def theme_css() -> str:
         border: 1px solid var(--cg-card-border);
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.30);
+        box-shadow: 0 1px 6px rgba(21,34,56,0.06);
     }}
 
     /* ---------- Boîtes d'information ---------- */
@@ -673,7 +673,7 @@ def theme_css() -> str:
     }}
     div[data-testid="stVerticalBlockBorderWrapper"] > div {{
         border-radius: 14px !important;
-        box-shadow: 0 3px 14px rgba(0,0,0,0.35);
+        box-shadow: 0 3px 14px rgba(21,34,56,0.07);
         background: var(--cg-card);
     }}
     div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] {{
@@ -687,7 +687,7 @@ def theme_css() -> str:
         border-radius: 20px;
         padding: 2.4rem 2.6rem;
         margin-bottom: 1.6rem;
-        background: linear-gradient(120deg, {CG_BROWN} 0%, #8a5a2e 45%, {CG_TERRA} 100%);
+        background: linear-gradient(120deg, {CG_BROWN} 0%, #9B5FBF 45%, {CG_TERRA} 100%);
         box-shadow: 0 10px 30px rgba(110,68,35,0.25);
     }}
     .cg-hero-pattern {{
@@ -757,7 +757,7 @@ def theme_css() -> str:
         border: 1px solid var(--cg-card-border);
         border-radius: 14px;
         padding: 1.2rem 1.3rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.30);
+        box-shadow: 0 2px 10px rgba(21,34,56,0.06);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
         position: relative;
         overflow: hidden;
@@ -771,7 +771,7 @@ def theme_css() -> str:
     }}
     .cg-kpi-card:hover {{
         transform: translateY(-3px);
-        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
+        box-shadow: 0 10px 22px rgba(21,34,56,0.14);
     }}
     .cg-kpi-icon {{
         width: 42px;
@@ -840,7 +840,7 @@ def theme_css() -> str:
         border-radius: 14px;
         padding: 1.1rem 1.4rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.30);
+        box-shadow: 0 2px 10px rgba(21,34,56,0.06);
     }}
     .cg-page-intro-icon {{
         width: 48px;
