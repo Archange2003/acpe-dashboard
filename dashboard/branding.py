@@ -834,7 +834,7 @@ def theme_css() -> str:
         display: flex;
         align-items: center;
         gap: 1rem;
-        background: linear-gradient(135deg, var(--cg-card) 0%, #1c2338 100%);
+        background: var(--cg-card);
         border: 1px solid var(--cg-card-border);
         border-left: 5px solid var(--intro-accent, {CG_BROWN});
         border-radius: 14px;
