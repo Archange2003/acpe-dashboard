@@ -49,9 +49,15 @@ def get_data():
 
 @st.cache_data(show_spinner="Calcul des recommandations pour l'ensemble des candidats (une seule fois, ~30s)...")
 def get_recommendations(_dem, _off):
-    reco_path = os.path.join(OUT_DIR, "recommandations_top10.csv")
-    if os.path.exists(reco_path):
-        return pd.read_csv(reco_path)
+    for fname in ["recommandations_top10.csv.gz", "recommandations_top10.csv"]:
+        reco_path = os.path.join(OUT_DIR, fname)
+        if os.path.exists(reco_path) and os.path.getsize(reco_path) > 100:
+            try:
+                df = pd.read_csv(reco_path)
+                if not df.empty:
+                    return df
+            except (pd.errors.EmptyDataError, pd.errors.ParserError):
+                continue
     return generate_recommendations(_dem, _off, top_k=10)
 
 
