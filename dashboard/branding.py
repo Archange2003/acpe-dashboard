@@ -36,14 +36,20 @@ CG_GREEN = "#0B6B3A"      # vert du drapeau
 CG_YELLOW = "#F2C230"     # jaune du drapeau
 CG_RED = "#B7241D"        # rouge du drapeau
 
-# Palette principale du tableau de bord — tons chauds (marron / ocre / terre)
-CG_BROWN = "#6E4423"      # marron profond — couleur principale du thème (onglets, boutons, accents)
-CG_OCHRE = "#C8892E"      # ocre chaud — accent secondaire
-CG_TERRA = "#A8501F"      # terre cuite — accent tertiaire
-CG_GOLD = "#B8862B"       # or institutionnel — armoiries, devise
-CG_RIVER = "#5A4632"      # brun-gris profond, ton neutre complémentaire (graphiques)
-CG_IVORY = "#F7F1E4"      # fond de page — sable clair, chaud
-CG_INK = "#2B2016"        # encre — texte principal (brun très sombre)
+# Palette principale du tableau de bord — thème sombre, accents vifs
+CG_BROWN = "#6C5CE7"      # violet — couleur principale du thème (onglets, boutons, accents)
+CG_OCHRE = "#2DD4BF"      # turquoise — accent secondaire
+CG_TERRA = "#F5A623"      # orange — accent tertiaire
+CG_GOLD = "#F2C230"       # or/jaune — armoiries, devise (reste doré, lisible sur fond sombre)
+CG_RIVER = "#3B82F6"      # bleu — accent complémentaire (graphiques)
+CG_IVORY = "#0F1420"      # fond de page — bleu nuit très sombre
+CG_INK = "#F1F5F9"        # texte principal — blanc cassé (lisible sur fond sombre)
+
+# Couleurs additionnelles spécifiques au thème sombre
+CG_CARD = "#171D2E"       # fond des cartes
+CG_CARD_BORDER = "#28304A"  # bordure des cartes
+CG_TEXT_MUTED = "#94A3B8"   # texte secondaire (gris-bleu clair)
+CG_GRID = "#232B41"          # lignes de grille des graphiques
 
 FONTS_IMPORT = (
     "https://fonts.googleapis.com/css2?"
@@ -215,9 +221,9 @@ def render_divider():
     import streamlit as st
     st.markdown(
         _clean(f"""<div style="display:flex;align-items:center;gap:0.6rem;margin:1.6rem 0 1.3rem 0;">
-            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #e3ddc8 15%, #e3ddc8 85%, transparent);"></div>
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #28304A 15%, #28304A 85%, transparent);"></div>
             {compass_tick_svg(20)}
-            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #e3ddc8 15%, #e3ddc8 85%, transparent);"></div>
+            <div style="flex:1;height:1px;background:linear-gradient(90deg, transparent, #28304A 15%, #28304A 85%, transparent);"></div>
         </div>"""),
         unsafe_allow_html=True,
     )
@@ -302,7 +308,7 @@ def gradient_colors(values, color_from: str, color_to: str) -> list:
     return out
 
 
-PLOTLY_COLORWAY = [CG_BROWN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
+PLOTLY_COLORWAY = [CG_BROWN, CG_OCHRE, CG_TERRA, CG_RIVER, "#EC4899", "#22D3EE"]
 
 
 # --------------------------------------------------------------------------- Jeu d'icônes (style trait, cohérent)
@@ -407,15 +413,15 @@ def style_fig(fig, title: str = ""):
         coloraxis_showscale=False,
     )
     fig.update_xaxes(
-        gridcolor="#EFEAD9", zeroline=False,
+        gridcolor="#232B41", zeroline=False,
         title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
-        tickfont=dict(size=11.5, color="#4a4a3e"),
+        tickfont=dict(size=11.5, color="#B8C2D6"),
         title_standoff=10,
     )
     fig.update_yaxes(
-        gridcolor="#EFEAD9", zeroline=False,
+        gridcolor="#232B41", zeroline=False,
         title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
-        tickfont=dict(size=11.5, color="#4a4a3e"),
+        tickfont=dict(size=11.5, color="#B8C2D6"),
         title_standoff=10,
     )
     return fig
@@ -438,6 +444,9 @@ def theme_css() -> str:
         --cg-primary: {CG_BROWN};
         --cg-ochre: {CG_OCHRE};
         --cg-terra: {CG_TERRA};
+        --cg-card: {CG_CARD};
+        --cg-card-border: {CG_CARD_BORDER};
+        --cg-text-muted: {CG_TEXT_MUTED};
     }}
 
     /* ---------- Fond général & typographie ---------- */
@@ -464,9 +473,9 @@ def theme_css() -> str:
         overflow: hidden;
         border-radius: 16px;
         margin: 0.4rem 0 1.6rem 0;
-        background: #ffffff;
-        border: 1px solid #eee7d3;
-        box-shadow: 0 4px 16px rgba(22,36,28,0.06);
+        background: var(--cg-card);
+        border: 1px solid var(--cg-card-border);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.35);
     }}
     .cg-header-accent {{
         height: 6px;
@@ -494,7 +503,7 @@ def theme_css() -> str:
     .cg-header-divider {{
         width: 1px;
         align-self: stretch;
-        background: #ece6d4;
+        background: var(--cg-card-border);
         flex: 0 0 auto;
     }}
     .cg-title {{
@@ -508,7 +517,7 @@ def theme_css() -> str:
     }}
     .cg-subtitle {{
         font-size: 0.93rem;
-        color: #5a5a4c;
+        color: var(--cg-text-muted);
         margin-top: 0.3rem;
     }}
     .cg-badge-flag-row {{
@@ -518,7 +527,7 @@ def theme_css() -> str:
         margin-top: 0.4rem;
         justify-content: center;
         font-size: 0.8rem;
-        color: #7a7a6a;
+        color: var(--cg-text-muted);
         font-weight: 600;
         letter-spacing: 0.3px;
     }}
@@ -552,28 +561,28 @@ def theme_css() -> str:
     }}
     .cg-section-sub {{
         font-size: 0.86rem;
-        color: #7a7a6a;
+        color: var(--cg-text-muted);
         margin-top: 0.1rem;
     }}
 
     /* ---------- Cartes de métriques Streamlit ---------- */
     div[data-testid="stMetric"] {{
-        background: #ffffff;
-        border: 1px solid #eee7d3;
+        background: var(--cg-card);
+        border: 1px solid var(--cg-card-border);
         border-top: 4px solid var(--cg-primary);
         border-radius: 12px;
         padding: 1.1rem 1.2rem 0.9rem 1.2rem;
-        box-shadow: 0 2px 10px rgba(22,36,28,0.06);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.35);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }}
     div[data-testid="stMetric"]:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(22,36,28,0.10);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.45);
     }}
     div[data-testid="stMetric"]:nth-of-type(4n+2) {{ border-top-color: var(--cg-gold); }}
     div[data-testid="stMetric"]:nth-of-type(4n+3) {{ border-top-color: var(--cg-red); }}
     div[data-testid="stMetric"]:nth-of-type(4n+4) {{ border-top-color: var(--cg-river); }}
-    div[data-testid="stMetricLabel"] {{ color: #5a5a4c; font-weight: 600; font-size: 0.85rem; }}
+    div[data-testid="stMetricLabel"] {{ color: var(--cg-text-muted); font-weight: 600; font-size: 0.85rem; }}
     div[data-testid="stMetricValue"] {{ color: var(--cg-ink); font-weight: 700; }}
 
     /* ---------- Onglets ---------- */
@@ -581,7 +590,7 @@ def theme_css() -> str:
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 600;
         font-size: 0.98rem;
-        color: #6a6a5c;
+        color: var(--cg-text-muted);
     }}
     button[data-baseweb="tab"][aria-selected="true"] {{
         color: var(--cg-primary) !important;
@@ -591,7 +600,7 @@ def theme_css() -> str:
         height: 3px !important;
         border-radius: 3px;
     }}
-    div[data-baseweb="tab-border"] {{ background-color: #eee7d3 !important; }}
+    div[data-baseweb="tab-border"] {{ background-color: var(--cg-card-border) !important; }}
 
     /* ---------- Boutons ---------- */
     .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {{
@@ -622,8 +631,8 @@ def theme_css() -> str:
     .cg-banner-card {{
         border-radius: 14px;
         overflow: hidden;
-        border: 1px solid #eee7d3;
-        box-shadow: 0 4px 14px rgba(22,36,28,0.08);
+        border: 1px solid var(--cg-card-border);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
         margin: 0.3rem 0 0.6rem 0;
     }}
     .cg-banner-card img {{ width: 100%; display: block; }}
@@ -631,26 +640,26 @@ def theme_css() -> str:
     .cg-map-card {{
         border-radius: 14px;
         overflow: hidden;
-        border: 1px solid #eee7d3;
-        box-shadow: 0 4px 14px rgba(22,36,28,0.08);
-        background: white;
+        border: 1px solid var(--cg-card-border);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        background: var(--cg-card);
         padding: 0.6rem 0.6rem 0.3rem 0.6rem;
     }}
     .cg-map-card img {{ width: 100%; display: block; border-radius: 8px; }}
     .cg-map-caption {{
         text-align: center;
         font-size: 0.78rem;
-        color: #8a8a7a;
+        color: var(--cg-text-muted);
         padding: 0.45rem 0 0.15rem 0;
         font-style: italic;
     }}
 
     /* ---------- Dataframes ---------- */
     div[data-testid="stDataFrame"] {{
-        border: 1px solid #eee7d3;
+        border: 1px solid var(--cg-card-border);
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 6px rgba(22,36,28,0.05);
+        box-shadow: 0 1px 6px rgba(0,0,0,0.30);
     }}
 
     /* ---------- Boîtes d'information ---------- */
@@ -664,8 +673,8 @@ def theme_css() -> str:
     }}
     div[data-testid="stVerticalBlockBorderWrapper"] > div {{
         border-radius: 14px !important;
-        box-shadow: 0 3px 14px rgba(22,36,28,0.06);
-        background: #ffffff;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.35);
+        background: var(--cg-card);
     }}
     div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] {{
         gap: 0.6rem;
@@ -744,11 +753,11 @@ def theme_css() -> str:
         margin-bottom: 0.4rem;
     }}
     .cg-kpi-card {{
-        background: #ffffff;
-        border: 1px solid #eee7d3;
+        background: var(--cg-card);
+        border: 1px solid var(--cg-card-border);
         border-radius: 14px;
         padding: 1.2rem 1.3rem;
-        box-shadow: 0 2px 10px rgba(22,36,28,0.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.30);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
         position: relative;
         overflow: hidden;
@@ -762,7 +771,7 @@ def theme_css() -> str:
     }}
     .cg-kpi-card:hover {{
         transform: translateY(-3px);
-        box-shadow: 0 10px 22px rgba(22,36,28,0.11);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
     }}
     .cg-kpi-icon {{
         width: 42px;
@@ -771,7 +780,7 @@ def theme_css() -> str:
         display: flex;
         align-items: center;
         justify-content: center;
-        background: color-mix(in srgb, var(--kpi-accent, {CG_BROWN}) 12%, white);
+        background: color-mix(in srgb, var(--kpi-accent, {CG_BROWN}) 22%, var(--cg-card));
         margin-bottom: 0.7rem;
     }}
     .cg-kpi-value {{
@@ -783,7 +792,7 @@ def theme_css() -> str:
     }}
     .cg-kpi-label {{
         font-size: 0.82rem;
-        color: #7a7a6a;
+        color: var(--cg-text-muted);
         margin-top: 0.3rem;
         font-weight: 500;
     }}
@@ -803,7 +812,7 @@ def theme_css() -> str:
         width: 36px;
         height: 36px;
         border-radius: 9px;
-        background: #eaf3ee;
+        background: rgba(108,92,231,0.16);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -817,7 +826,7 @@ def theme_css() -> str:
     }}
     .cg-card-subtitle {{
         font-size: 0.8rem;
-        color: #8a8a7a;
+        color: var(--cg-text-muted);
     }}
 
     /* ---------- En-tête de page compact (onglets secondaires) ---------- */
@@ -825,19 +834,19 @@ def theme_css() -> str:
         display: flex;
         align-items: center;
         gap: 1rem;
-        background: linear-gradient(135deg, #ffffff 0%, #f7f5ee 100%);
-        border: 1px solid #eee7d3;
+        background: linear-gradient(135deg, var(--cg-card) 0%, #1c2338 100%);
+        border: 1px solid var(--cg-card-border);
         border-left: 5px solid var(--intro-accent, {CG_BROWN});
         border-radius: 14px;
         padding: 1.1rem 1.4rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 2px 10px rgba(22,36,28,0.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.30);
     }}
     .cg-page-intro-icon {{
         width: 48px;
         height: 48px;
         border-radius: 12px;
-        background: color-mix(in srgb, var(--intro-accent, {CG_BROWN}) 14%, white);
+        background: color-mix(in srgb, var(--intro-accent, {CG_BROWN}) 22%, var(--cg-card));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -851,14 +860,14 @@ def theme_css() -> str:
     }}
     .cg-page-intro-sub {{
         font-size: 0.88rem;
-        color: #7a7a6a;
+        color: var(--cg-text-muted);
         margin-top: 0.15rem;
     }}
 
     /* ---------- Pied de page ---------- */
     .cg-footer {{
         text-align: center;
-        color: #9a9a8a;
+        color: var(--cg-text-muted);
         font-size: 0.82rem;
         padding: 1.4rem 0 0.6rem 0;
     }}

@@ -108,7 +108,7 @@ with tab_overview:
             fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "secteur": "Secteur d'activité"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
-            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#e7dccb", CG_BROWN))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#2e2a4d", CG_BROWN))
             st.plotly_chart(style_fig(fig, "Top 10 des secteurs par nombre d'offres"), use_container_width=True)
 
     with col2:
@@ -119,7 +119,7 @@ with tab_overview:
             fig = px.bar(top_metiers, x="nombre", y="métier", orientation="h",
                          labels={"nombre": "Nombre de candidats", "métier": "Métier visé"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
-            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_metiers["nombre"], "#f2e2b8", CG_GOLD))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_metiers["nombre"], "#4a3d1f", CG_GOLD))
             st.plotly_chart(style_fig(fig, "Top 10 des métiers par nombre de candidats"), use_container_width=True)
 
     render_divider()
@@ -145,7 +145,7 @@ with tab_overview:
             fig = px.bar(lieu_sorted, x="nombre", y="lieu", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "lieu": "Ville"})
             fig.update_layout(height=210, margin=dict(t=5, l=5, r=5, b=5))
-            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#e7dccb", CG_BROWN))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#2e2a4d", CG_BROWN))
             st.plotly_chart(style_fig(fig, "Classement des villes par nombre d'offres"), use_container_width=True)
 
         with st.container(border=True):
