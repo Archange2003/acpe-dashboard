@@ -363,7 +363,8 @@ def render_card_open(title: str = "", subtitle: str = "", icon: str = None):
 
 def style_fig(fig):
     """Applique un habillage graphique cohérent (police, couleurs, fond transparent)
-    à toute figure Plotly du tableau de bord."""
+    à toute figure Plotly du tableau de bord, avec des titres d'axes explicites,
+    lisibles et de taille suffisante."""
     fig.update_layout(
         font=dict(family="Inter, sans-serif", size=13, color=CG_INK),
         title_font=dict(family="Space Grotesk, sans-serif", size=15, color=CG_INK),
@@ -371,10 +372,21 @@ def style_fig(fig):
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         margin=dict(t=40, l=10, r=10, b=10),
-        legend=dict(bgcolor="rgba(0,0,0,0)"),
+        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=12)),
+        coloraxis_showscale=False,
     )
-    fig.update_xaxes(gridcolor="#EFEAD9", zeroline=False)
-    fig.update_yaxes(gridcolor="#EFEAD9", zeroline=False)
+    fig.update_xaxes(
+        gridcolor="#EFEAD9", zeroline=False,
+        title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
+        tickfont=dict(size=11.5, color="#4a4a3e"),
+        title_standoff=10,
+    )
+    fig.update_yaxes(
+        gridcolor="#EFEAD9", zeroline=False,
+        title_font=dict(size=13, color=CG_INK, family="Inter, sans-serif"),
+        tickfont=dict(size=11.5, color="#4a4a3e"),
+        title_standoff=10,
+    )
     return fig
 
 

@@ -106,7 +106,8 @@ with tab_overview:
             top_sect = off[off["secteur"] != ""]["secteur"].value_counts().head(10).reset_index()
             top_sect.columns = ["secteur", "nombre"]
             fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h", color="nombre",
-                         color_continuous_scale=["#d9ecdf", CG_GREEN])
+                         color_continuous_scale=["#d9ecdf", CG_GREEN],
+                         labels={"nombre": "Nombre d'offres d'emploi", "secteur": "Secteur d'activité"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=380)
             fig.update_traces(marker_line_width=0)
             st.plotly_chart(style_fig(fig), use_container_width=True)
@@ -117,7 +118,8 @@ with tab_overview:
             top_metiers = dem[dem["qualification_metier"] != ""]["qualification_metier"].value_counts().head(10).reset_index()
             top_metiers.columns = ["métier", "nombre"]
             fig = px.bar(top_metiers, x="nombre", y="métier", orientation="h", color="nombre",
-                         color_continuous_scale=["#f2e2b8", CG_GOLD])
+                         color_continuous_scale=["#f2e2b8", CG_GOLD],
+                         labels={"nombre": "Nombre de candidats", "métier": "Métier visé"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=380)
             fig.update_traces(marker_line_width=0)
             st.plotly_chart(style_fig(fig), use_container_width=True)
@@ -133,7 +135,8 @@ with tab_overview:
                 render_map_card("Répartition des offres d'emploi sur le territoire national")
             else:
                 fig = px.pie(lieu_counts, names="lieu", values="nombre", hole=0.5,
-                             color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, "#6FA287"])
+                             color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, "#6FA287"],
+                             labels={"lieu": "Ville", "nombre": "Nombre d'offres"})
                 fig.update_layout(height=360)
                 st.plotly_chart(style_fig(fig), use_container_width=True)
 
@@ -141,7 +144,8 @@ with tab_overview:
         with st.container(border=True):
             render_card_open("Top localités", "Nombre d'offres par ville", icon="chart")
             fig = px.bar(lieu_counts.sort_values("nombre"), x="nombre", y="lieu", orientation="h",
-                         color="nombre", color_continuous_scale=["#d9ecdf", CG_GREEN])
+                         color="nombre", color_continuous_scale=["#d9ecdf", CG_GREEN],
+                         labels={"nombre": "Nombre d'offres d'emploi", "lieu": "Ville"})
             fig.update_layout(coloraxis_showscale=False, height=210, margin=dict(t=5, l=5, r=5, b=5))
             fig.update_traces(marker_line_width=0)
             st.plotly_chart(style_fig(fig), use_container_width=True)
@@ -151,7 +155,8 @@ with tab_overview:
             obj_counts = dem["Objectif"].value_counts().reset_index()
             obj_counts.columns = ["objectif", "nombre"]
             fig = px.pie(obj_counts, names="objectif", values="nombre", hole=0.55,
-                         color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED])
+                         color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED],
+                         labels={"objectif": "Objectif recherché", "nombre": "Nombre de candidats"})
             fig.update_layout(height=250, margin=dict(t=5, l=5, r=5, b=5))
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
@@ -173,9 +178,11 @@ with tab_reco:
             c2.metric("Score moyen (Top-1)", f"{reco[reco['rank']==1]['score'].mean():.1%}")
             c3.metric("Score médian (Top-1)", f"{reco[reco['rank']==1]['score'].median():.1%}")
 
-            fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_GREEN])
+            fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_GREEN],
+                               labels={"score": "Score de compatibilité (meilleure offre)"})
             fig.update_traces(marker_line_width=0)
-            fig.update_layout(bargap=0.05)
+            fig.update_layout(bargap=0.05, yaxis_title="Nombre de candidats")
+            fig.update_xaxes(tickformat=".0%")
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
         render_divider()
