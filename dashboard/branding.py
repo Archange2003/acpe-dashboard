@@ -51,6 +51,14 @@ CG_CARD_BORDER = "#D6E4F3"   # bordure des cartes — bleu très pâle
 CG_TEXT_MUTED = "#57708C"    # texte secondaire (bleu-gris moyen)
 CG_GRID = "#DCE7F5"          # lignes de grille des graphiques
 
+# Barre latérale (navigation verticale) — reprend le thème sombre initial,
+# indépendamment du thème clair du contenu principal
+CG_SIDEBAR_BG = "#0F1420"        # fond de la barre latérale — bleu nuit très sombre
+CG_SIDEBAR_HOVER = "#1B2438"     # fond au survol / élément actif
+CG_SIDEBAR_TEXT = "#F1F5F9"      # texte principal de la barre latérale
+CG_SIDEBAR_TEXT_MUTED = "#8B93A7"  # texte secondaire de la barre latérale
+CG_SIDEBAR_BORDER = "#232C42"    # séparateurs internes
+
 FONTS_IMPORT = (
     "https://fonts.googleapis.com/css2?"
     "family=Space+Grotesk:wght@500;600;700&"
@@ -910,6 +918,70 @@ def theme_css() -> str:
     }}
     /* Onglets internes (sous-onglets candidat/offre etc.) déjà couverts par button[data-baseweb=tab] */
 
+    /* ---------- Barre latérale : navigation verticale sombre ---------- */
+    section[data-testid="stSidebar"] {{
+        background: {CG_SIDEBAR_BG} !important;
+        border-right: 1px solid {CG_SIDEBAR_BORDER};
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: {CG_SIDEBAR_TEXT} !important;
+    }}
+    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {{
+        color: {CG_SIDEBAR_TEXT} !important;
+    }}
+    .cg-sidebar-brand {{
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.4rem 0.2rem 1.2rem 0.2rem;
+        margin-bottom: 0.8rem;
+        border-bottom: 1px solid {CG_SIDEBAR_BORDER};
+    }}
+    .cg-sidebar-brand-title {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: {CG_SIDEBAR_TEXT} !important;
+        line-height: 1.2;
+    }}
+    .cg-sidebar-brand-sub {{
+        font-size: 0.72rem;
+        color: {CG_SIDEBAR_TEXT_MUTED} !important;
+    }}
+    /* Menu de navigation (st.radio détourné en liste de liens) */
+    section[data-testid="stSidebar"] [data-testid="stRadio"] > div {{
+        gap: 0.3rem;
+    }}
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label {{
+        background: transparent;
+        border-radius: 10px;
+        padding: 0.65rem 0.8rem !important;
+        width: 100%;
+        transition: background 0.15s ease;
+        font-weight: 600 !important;
+        font-size: 0.92rem !important;
+    }}
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {{
+        background: {CG_SIDEBAR_HOVER};
+    }}
+    /* Réduit (sans le masquer complètement, pour ne pas casser le clic) le cercle radio */
+    section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label > div:first-child {{
+        transform: scale(0.7);
+        opacity: 0.55;
+    }}
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {{
+        background: linear-gradient(90deg, {CG_BROWN}33, transparent);
+        border-left: 3px solid {CG_BROWN};
+    }}
+    .cg-sidebar-footer {{
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid {CG_SIDEBAR_BORDER};
+        font-size: 0.72rem;
+        color: {CG_SIDEBAR_TEXT_MUTED} !important;
+        text-align: center;
+    }}
+
     /* ---------- Pied de page ---------- */
     .cg-footer {{
         text-align: center;
@@ -962,6 +1034,38 @@ def render_header():
         """),
         unsafe_allow_html=True,
     )
+
+
+def render_sidebar_nav(pages: list, key: str = "cg_nav") -> str:
+    """Affiche la marque ACPE + un menu de navigation vertical stylé (barre latérale
+    sombre) et retourne le libellé de la page sélectionnée. `pages` est une liste
+    de libellés (avec emoji/icône déjà inclus, ex. "📊 Vue d'ensemble")."""
+    import streamlit as st
+
+    with st.sidebar:
+        logo = get_acpe_logo_html(34)
+        st.markdown(
+            _clean(f"""
+            <div class="cg-sidebar-brand">
+                {logo}
+                <div>
+                    <div class="cg-sidebar-brand-title">ACPE</div>
+                    <div class="cg-sidebar-brand-sub">Appariement intelligent</div>
+                </div>
+            </div>
+            """),
+            unsafe_allow_html=True,
+        )
+        selected = st.radio("Navigation", pages, label_visibility="collapsed", key=key)
+        st.markdown(
+            _clean(f"""
+            <div class="cg-sidebar-footer">
+                {flag_svg(20, 14)}<br/>Hackathon IndabaX Congo 2026
+            </div>
+            """),
+            unsafe_allow_html=True,
+        )
+    return selected
 
 
 def render_footer():

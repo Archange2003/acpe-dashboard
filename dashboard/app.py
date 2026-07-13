@@ -26,7 +26,7 @@ from skill_gap import skill_gap  # noqa: E402
 from branding import (  # noqa: E402
     render_header, render_footer, render_section_title, render_divider,
     render_banner_card, render_map_card, has_map_image, style_fig, gradient_colors,
-    render_hero, render_kpi_row, render_card_open, render_page_intro,
+    render_hero, render_kpi_row, render_card_open, render_page_intro, render_sidebar_nav,
     CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, CG_BROWN, CG_OCHRE, CG_TERRA,
 )
 
@@ -67,13 +67,12 @@ reco = get_recommendations(dem, off)
 
 render_header()
 
-tab_overview, tab_reco, tab_search, tab_skillgap = st.tabs(
-    ["📊 Vue d'ensemble", "🎯 Recommandations", "🔎 Recherche intelligente (Bonus 1)",
-     "🧩 Écarts de compétences (Bonus 2)"]
-)
+PAGES = ["📊 Vue d'ensemble", "🎯 Recommandations", "🔎 Recherche intelligente (Bonus 1)",
+         "🧩 Écarts de compétences (Bonus 2)"]
+page = render_sidebar_nav(PAGES)
 
 # ----------------------------------------------------------------- Vue d'ensemble
-with tab_overview:
+if page == PAGES[0]:
     render_hero(
         headline="Chaque profil mérite la bonne opportunité, en un instant.",
         subheadline=(
@@ -160,7 +159,7 @@ with tab_overview:
 
 
 # ----------------------------------------------------------------- Recommandations
-with tab_reco:
+if page == PAGES[1]:
     render_page_intro(
         "target", "Recommandations générées",
         "Le Top-10 des offres les plus compatibles, calculé pour chacun des 41 298 candidats.",
@@ -196,7 +195,7 @@ with tab_reco:
                          use_container_width=True, hide_index=True)
 
 # ----------------------------------------------------------------- Recherche (Bonus 1)
-with tab_search:
+if page == PAGES[2]:
     render_page_intro(
         "search", "Recherche intelligente",
         "Bonus 1 — interrogez les offres ou les candidats en langage naturel, sans mot-clé exact.",
@@ -216,7 +215,7 @@ with tab_search:
                 st.dataframe(results, use_container_width=True, hide_index=True)
 
 # ----------------------------------------------------------------- Skill gap (Bonus 2)
-with tab_skillgap:
+if page == PAGES[3]:
     render_page_intro(
         "puzzle", "Écarts de compétences",
         "Bonus 2 — pour une paire candidat/offre, identifiez les compétences déjà couvertes et celles qui manquent.",
