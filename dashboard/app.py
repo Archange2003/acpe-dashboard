@@ -109,7 +109,7 @@ with tab_overview:
                          labels={"nombre": "Nombre d'offres d'emploi", "secteur": "Secteur d'activité"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
             fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#d9ecdf", CG_GREEN))
-            st.plotly_chart(style_fig(fig), use_container_width=True)
+            st.plotly_chart(style_fig(fig, "Top 10 des secteurs par nombre d'offres"), use_container_width=True)
 
     with col2:
         with st.container(border=True):
@@ -120,7 +120,7 @@ with tab_overview:
                          labels={"nombre": "Nombre de candidats", "métier": "Métier visé"})
             fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
             fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_metiers["nombre"], "#f2e2b8", CG_GOLD))
-            st.plotly_chart(style_fig(fig), use_container_width=True)
+            st.plotly_chart(style_fig(fig, "Top 10 des métiers par nombre de candidats"), use_container_width=True)
 
     render_divider()
     col3, col4 = st.columns([1.1, 1])
@@ -136,7 +136,7 @@ with tab_overview:
                              color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED, CG_RIVER, "#6FA287"],
                              labels={"lieu": "Ville", "nombre": "Nombre d'offres"})
                 fig.update_layout(height=360)
-                st.plotly_chart(style_fig(fig), use_container_width=True)
+                st.plotly_chart(style_fig(fig, "Part des offres par ville"), use_container_width=True)
 
     with col4:
         with st.container(border=True):
@@ -146,7 +146,7 @@ with tab_overview:
                          labels={"nombre": "Nombre d'offres d'emploi", "lieu": "Ville"})
             fig.update_layout(height=210, margin=dict(t=5, l=5, r=5, b=5))
             fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#d9ecdf", CG_GREEN))
-            st.plotly_chart(style_fig(fig), use_container_width=True)
+            st.plotly_chart(style_fig(fig, "Classement des villes par nombre d'offres"), use_container_width=True)
 
         with st.container(border=True):
             render_card_open("Objectif des demandeurs", "", icon="target")
@@ -156,7 +156,7 @@ with tab_overview:
                          color_discrete_sequence=[CG_GREEN, CG_GOLD, CG_RED],
                          labels={"objectif": "Objectif recherché", "nombre": "Nombre de candidats"})
             fig.update_layout(height=250, margin=dict(t=5, l=5, r=5, b=5))
-            st.plotly_chart(style_fig(fig), use_container_width=True)
+            st.plotly_chart(style_fig(fig, "Répartition par objectif (emploi / stage / formation)"), use_container_width=True)
 
 
 # ----------------------------------------------------------------- Recommandations
@@ -181,7 +181,7 @@ with tab_reco:
             fig.update_traces(marker_line_width=0)
             fig.update_layout(bargap=0.05, yaxis_title="Nombre de candidats")
             fig.update_xaxes(tickformat=".0%")
-            st.plotly_chart(style_fig(fig), use_container_width=True)
+            st.plotly_chart(style_fig(fig, "Distribution des scores de la meilleure offre par candidat"), use_container_width=True)
 
         render_divider()
         with st.container(border=True):

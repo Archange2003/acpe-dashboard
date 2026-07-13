@@ -385,17 +385,18 @@ def render_card_open(title: str = "", subtitle: str = "", icon: str = None):
         )
 
 
-def style_fig(fig):
+def style_fig(fig, title: str = ""):
     """Applique un habillage graphique cohérent (police, couleurs, fond transparent)
-    à toute figure Plotly du tableau de bord, avec des titres d'axes explicites,
-    lisibles et de taille suffisante."""
+    à toute figure Plotly du tableau de bord, avec un titre explicite (le titre
+    interne de Plotly affichait littéralement « undefined » lorsqu'il n'était pas
+    fourni), des titres d'axes lisibles et de taille suffisante."""
     fig.update_layout(
+        title=dict(text=title, font=dict(family="Space Grotesk, sans-serif", size=14, color=CG_INK), x=0, xanchor="left"),
         font=dict(family="Inter, sans-serif", size=13, color=CG_INK),
-        title_font=dict(family="Space Grotesk, sans-serif", size=15, color=CG_INK),
         colorway=PLOTLY_COLORWAY,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        margin=dict(t=40, l=10, r=10, b=10),
+        margin=dict(t=36 if title else 10, l=10, r=10, b=10),
         legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=12)),
         coloraxis_showscale=False,
     )
@@ -432,10 +433,10 @@ def theme_css() -> str:
 
     /* ---------- Fond général & typographie ---------- */
     .stApp {{
-        background:
-            radial-gradient(circle at 100% 0%, rgba(11,107,58,0.05) 0%, transparent 38%),
-            radial-gradient(circle at 0% 15%, rgba(242,194,48,0.07) 0%, transparent 32%),
-            var(--cg-ivory);
+        background-color: var(--cg-ivory);
+        background-image: radial-gradient(circle, rgba(11,107,58,0.10) 1px, transparent 1px);
+        background-size: 24px 24px;
+        background-attachment: fixed;
     }}
     html, body, [class*="css"] {{
         font-family: 'Inter', -apple-system, sans-serif;
