@@ -272,6 +272,30 @@ def render_page_intro(icon: str, title: str, subtitle: str, accent: str = None):
     )
 
 
+def gradient_colors(values, color_from: str, color_to: str) -> list:
+    """Calcule un dégradé de couleurs proportionnel aux valeurs, appliqué directement
+    aux barres (sans passer par l'axe de couleur Plotly, qui générait un intitulé
+    « undefined » indésirable à côté des graphiques)."""
+    import numpy as np
+
+    def hex_to_rgb(h):
+        h = h.lstrip("#")
+        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+    def rgb_to_hex(rgb):
+        return "#{:02x}{:02x}{:02x}".format(*[max(0, min(255, round(c))) for c in rgb])
+
+    lo, hi = min(values), max(values)
+    span = (hi - lo) or 1
+    c0, c1 = hex_to_rgb(color_from), hex_to_rgb(color_to)
+    out = []
+    for v in values:
+        t = (v - lo) / span
+        rgb = tuple(c0[i] + (c1[i] - c0[i]) * t for i in range(3))
+        out.append(rgb_to_hex(rgb))
+    return out
+
+
 PLOTLY_COLORWAY = [CG_GREEN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
 
 
@@ -424,26 +448,27 @@ def theme_css() -> str:
         font-family: 'IBM Plex Mono', monospace !important;
     }}
 
-    /* ---------- Bandeau tricolore + motif discret ---------- */
-    .cg-topbar {{
-        height: 7px;
+    /* ---------- En-tête : panneau unique, structuré ---------- */
+    .cg-header {{
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        margin: 0.4rem 0 1.6rem 0;
+        background: #ffffff;
+        border: 1px solid #eee7d3;
+        box-shadow: 0 4px 16px rgba(22,36,28,0.06);
+    }}
+    .cg-header-accent {{
+        height: 6px;
         width: 100%;
         background: linear-gradient(90deg, var(--cg-green) 0 33%, var(--cg-yellow) 33% 66%, var(--cg-red) 66% 100%);
-        border-radius: 0 0 6px 6px;
-        margin-bottom: 1.3rem;
-        box-shadow: 0 2px 6px rgba(11,107,58,0.15);
     }}
-
-    /* ---------- En-tête ---------- */
-    .cg-header {{
+    .cg-header-row {{
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         gap: 1.6rem;
-        padding: 0.6rem 1.4rem 1.3rem 1.4rem;
-        margin: 0 -1rem 1.6rem -1rem;
-        border-bottom: 1px solid #e8e1c8;
-        background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
+        padding: 1.1rem 1.8rem;
     }}
     .cg-header-left, .cg-header-right {{
         flex: 0 0 auto;
@@ -453,11 +478,18 @@ def theme_css() -> str:
     }}
     .cg-header-center {{
         flex: 1 1 auto;
+        max-width: 640px;
         text-align: center;
+    }}
+    .cg-header-divider {{
+        width: 1px;
+        align-self: stretch;
+        background: #ece6d4;
+        flex: 0 0 auto;
     }}
     .cg-title {{
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.15rem;
+        font-size: 1.9rem;
         font-weight: 700;
         color: var(--cg-ink);
         margin: 0;
@@ -465,9 +497,9 @@ def theme_css() -> str:
         letter-spacing: -0.01em;
     }}
     .cg-subtitle {{
-        font-size: 0.97rem;
+        font-size: 0.93rem;
         color: #5a5a4c;
-        margin-top: 0.35rem;
+        margin-top: 0.3rem;
     }}
     .cg-badge-flag-row {{
         display: flex;
@@ -841,23 +873,26 @@ def flag_with_motto_html(flag_width: int = 60) -> str:
 
 
 def render_header():
-    """Injecte : bannière ACPE (tout en haut), bandeau tricolore, puis l'en-tête
-    (logo ACPE / titre / drapeau+devise) via st.markdown."""
+    """Injecte le bandeau d'en-tête (accent tricolore intégré, logo ACPE, titre,
+    drapeau+devise) via st.markdown — un panneau unique, propre et bien structuré."""
     import streamlit as st
 
     st.markdown(theme_css(), unsafe_allow_html=True)
-    render_banner_card()
-    st.markdown('<div class="cg-topbar"></div>', unsafe_allow_html=True)
     st.markdown(
         _clean(f"""
         <div class="cg-header">
-            <div class="cg-header-left">{get_acpe_logo_html(64)}</div>
-            <div class="cg-header-center">
-                <div class="cg-title">🧭 Tableau de bord décisionnel</div>
-                <div class="cg-subtitle">Appariement Demandeurs d'emploi / Offres d'emploi</div>
-                <div class="cg-badge-flag-row">Agence Congolaise pour l'Emploi (ACPE) — Hackathon IndabaX Congo 2026</div>
+            <div class="cg-header-accent"></div>
+            <div class="cg-header-row">
+                <div class="cg-header-left">{get_acpe_logo_html(58)}</div>
+                <div class="cg-header-divider"></div>
+                <div class="cg-header-center">
+                    <div class="cg-title">🧭 Tableau de bord décisionnel</div>
+                    <div class="cg-subtitle">Appariement Demandeurs d'emploi / Offres d'emploi</div>
+                    <div class="cg-badge-flag-row">Agence Congolaise pour l'Emploi (ACPE) — Hackathon IndabaX Congo 2026</div>
+                </div>
+                <div class="cg-header-divider"></div>
+                <div class="cg-header-right">{flag_with_motto_html(52)}</div>
             </div>
-            <div class="cg-header-right">{flag_with_motto_html(60)}</div>
         </div>
         """),
         unsafe_allow_html=True,

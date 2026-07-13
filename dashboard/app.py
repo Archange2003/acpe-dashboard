@@ -25,7 +25,7 @@ from search import SearchEngine  # noqa: E402
 from skill_gap import skill_gap  # noqa: E402
 from branding import (  # noqa: E402
     render_header, render_footer, render_section_title, render_divider,
-    render_banner_card, render_map_card, has_map_image, style_fig,
+    render_banner_card, render_map_card, has_map_image, style_fig, gradient_colors,
     render_hero, render_kpi_row, render_card_open, render_page_intro,
     CG_GREEN, CG_GOLD, CG_RED, CG_RIVER,
 )
@@ -105,11 +105,10 @@ with tab_overview:
             render_card_open("Secteurs les plus représentés", "Offres d'emploi par secteur d'activité", icon="building")
             top_sect = off[off["secteur"] != ""]["secteur"].value_counts().head(10).reset_index()
             top_sect.columns = ["secteur", "nombre"]
-            fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h", color="nombre",
-                         color_continuous_scale=["#d9ecdf", CG_GREEN],
+            fig = px.bar(top_sect, x="nombre", y="secteur", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "secteur": "Secteur d'activité"})
-            fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=380)
-            fig.update_traces(marker_line_width=0)
+            fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_sect["nombre"], "#d9ecdf", CG_GREEN))
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
     with col2:
@@ -117,11 +116,10 @@ with tab_overview:
             render_card_open("Métiers les plus demandés", "Profils recherchés par les candidats", icon="people")
             top_metiers = dem[dem["qualification_metier"] != ""]["qualification_metier"].value_counts().head(10).reset_index()
             top_metiers.columns = ["métier", "nombre"]
-            fig = px.bar(top_metiers, x="nombre", y="métier", orientation="h", color="nombre",
-                         color_continuous_scale=["#f2e2b8", CG_GOLD],
+            fig = px.bar(top_metiers, x="nombre", y="métier", orientation="h",
                          labels={"nombre": "Nombre de candidats", "métier": "Métier visé"})
-            fig.update_layout(yaxis={"categoryorder": "total ascending"}, coloraxis_showscale=False, height=380)
-            fig.update_traces(marker_line_width=0)
+            fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=380)
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(top_metiers["nombre"], "#f2e2b8", CG_GOLD))
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
     render_divider()
@@ -143,11 +141,11 @@ with tab_overview:
     with col4:
         with st.container(border=True):
             render_card_open("Top localités", "Nombre d'offres par ville", icon="chart")
-            fig = px.bar(lieu_counts.sort_values("nombre"), x="nombre", y="lieu", orientation="h",
-                         color="nombre", color_continuous_scale=["#d9ecdf", CG_GREEN],
+            lieu_sorted = lieu_counts.sort_values("nombre")
+            fig = px.bar(lieu_sorted, x="nombre", y="lieu", orientation="h",
                          labels={"nombre": "Nombre d'offres d'emploi", "lieu": "Ville"})
-            fig.update_layout(coloraxis_showscale=False, height=210, margin=dict(t=5, l=5, r=5, b=5))
-            fig.update_traces(marker_line_width=0)
+            fig.update_layout(height=210, margin=dict(t=5, l=5, r=5, b=5))
+            fig.update_traces(marker_line_width=0, marker_color=gradient_colors(lieu_sorted["nombre"], "#d9ecdf", CG_GREEN))
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
         with st.container(border=True):
