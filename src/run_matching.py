@@ -20,7 +20,7 @@ from matching_engine import build_tfidf, W_TEXT, W_SECTEUR, W_MOBILITE, W_CONTRA
 
 import os
 OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "outputs")
-CHUNK = 2000
+CHUNK = 500  # réduit (au lieu de 2000) pour limiter le pic mémoire sur serveurs à ressources limitées
 TOP_K = 10
 
 
