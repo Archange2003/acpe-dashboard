@@ -31,6 +31,35 @@ def clean_text(x) -> str:
     return x.strip()
 
 
+def build_texte_profil(r: dict) -> str:
+    """Construit le champ texte unifié et pondéré à partir d'un profil candidat
+    (dict ou ligne de DataFrame avec les mêmes clés que load_demandeurs())."""
+    parts = []
+    parts += [r.get("Métier visé / Qualification visée", "")] * 3
+    parts += [r.get("qualification_metier", "")] * 3
+    parts += [r.get("Secteur demandé", "")] * 2
+    parts += [r.get("secteur_metier", "")] * 2
+    parts += [r.get("Filière / Spécialité", "")] * 2
+    parts += [r.get("Qualification", "")]
+    parts += [r.get("Secteur d'activité", "")]
+    parts += [r.get("Diplome", "")]
+    parts += [r.get("niveau_etude", "")]
+    return " ".join(p for p in parts if p)
+
+
+def build_texte_offre(r: dict) -> str:
+    """Construit le champ texte unifié et pondéré à partir d'une offre
+    (dict ou ligne de DataFrame avec les mêmes clés que load_offres())."""
+    parts = []
+    parts += [r.get("intitule", "")] * 3
+    parts += [r.get("secteur", "")] * 2
+    parts += [r.get("profil", "")] * 2
+    parts += [r.get("competences", "")] * 2
+    parts += [r.get("description", "")]
+    parts += [r.get("type_contrat", "")]
+    return " ".join(p for p in parts if p)
+
+
 def load_demandeurs() -> pd.DataFrame:
     df = pd.read_excel(f"{DATA_DIR}/demandeurs.xlsx")
     df.columns = [c.strip() for c in df.columns]
@@ -54,20 +83,7 @@ def load_demandeurs() -> pd.DataFrame:
 
     # Champ texte unifié pour le NLP, avec pondération par répétition
     # des champs les plus discriminants (métier visé, secteur demandé, qualification)
-    def build_text(r):
-        parts = []
-        parts += [r["Métier visé / Qualification visée"]] * 3
-        parts += [r["qualification_metier"]] * 3
-        parts += [r["Secteur demandé"]] * 2
-        parts += [r["secteur_metier"]] * 2
-        parts += [r["Filière / Spécialité"]] * 2
-        parts += [r["Qualification"]]
-        parts += [r["Secteur d'activité"]]
-        parts += [r["Diplome"]]
-        parts += [r["niveau_etude"]]
-        return " ".join(p for p in parts if p)
-
-    df["texte_profil"] = df.apply(build_text, axis=1)
+    df["texte_profil"] = df.apply(lambda r: build_texte_profil(r.to_dict()), axis=1)
     df = df.rename(columns={"Matricule": "id_demandeur"})
     return df
 
@@ -139,17 +155,7 @@ def load_offres() -> pd.DataFrame:
 
     offres = offres.drop_duplicates(subset="id_offre").reset_index(drop=True)
 
-    def build_text(r):
-        parts = []
-        parts += [r["intitule"]] * 3
-        parts += [r["secteur"]] * 2
-        parts += [r["profil"]] * 2
-        parts += [r["competences"]] * 2
-        parts += [r["description"]]
-        parts += [r["type_contrat"]]
-        return " ".join(p for p in parts if p)
-
-    offres["texte_offre"] = offres.apply(build_text, axis=1)
+    offres["texte_offre"] = offres.apply(lambda r: build_texte_offre(r.to_dict()), axis=1)
     return offres
 
 
