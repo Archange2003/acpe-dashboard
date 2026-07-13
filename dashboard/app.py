@@ -26,7 +26,7 @@ from skill_gap import skill_gap  # noqa: E402
 from branding import (  # noqa: E402
     render_header, render_footer, render_section_title, render_divider,
     render_banner_card, render_map_card, has_map_image, style_fig,
-    render_hero, render_kpi_row, render_card_open,
+    render_hero, render_kpi_row, render_card_open, render_page_intro,
     CG_GREEN, CG_GOLD, CG_RED, CG_RIVER,
 )
 
@@ -155,41 +155,50 @@ with tab_overview:
             fig.update_layout(height=250, margin=dict(t=5, l=5, r=5, b=5))
             st.plotly_chart(style_fig(fig), use_container_width=True)
 
-    render_divider()
-    render_banner_card()
 
 # ----------------------------------------------------------------- Recommandations
 with tab_reco:
+    render_page_intro(
+        "target", "Recommandations générées",
+        "Le Top-10 des offres les plus compatibles, calculé pour chacun des 41 298 candidats.",
+        accent=CG_GOLD,
+    )
     if reco is None:
         st.warning("Aucun fichier de recommandations trouvé. Lancez `python src/run_matching.py` d'abord.")
     else:
-        render_section_title("Statistiques sur les recommandations générées", "Distribution des scores calculés pour tous les candidats")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Candidats couverts", f"{reco['candidate_id'].nunique():,}".replace(",", " "))
-        c2.metric("Score moyen (Top-1)", f"{reco[reco['rank']==1]['score'].mean():.1%}")
-        c3.metric("Score médian (Top-1)", f"{reco[reco['rank']==1]['score'].median():.1%}")
+        with st.container(border=True):
+            render_card_open("Statistiques sur les recommandations générées", "Distribution des scores calculés pour tous les candidats", icon="chart")
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Candidats couverts", f"{reco['candidate_id'].nunique():,}".replace(",", " "))
+            c2.metric("Score moyen (Top-1)", f"{reco[reco['rank']==1]['score'].mean():.1%}")
+            c3.metric("Score médian (Top-1)", f"{reco[reco['rank']==1]['score'].median():.1%}")
 
-        fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_GREEN])
-        fig.update_traces(marker_line_width=0)
-        fig.update_layout(bargap=0.05)
-        st.plotly_chart(style_fig(fig), use_container_width=True)
+            fig = px.histogram(reco[reco["rank"] == 1], x="score", nbins=40, color_discrete_sequence=[CG_GREEN])
+            fig.update_traces(marker_line_width=0)
+            fig.update_layout(bargap=0.05)
+            st.plotly_chart(style_fig(fig), use_container_width=True)
 
         render_divider()
-        render_section_title("Consulter les recommandations d'un candidat", "")
-        cid = st.selectbox("Choisir un candidat", options=sorted(reco["candidate_id"].unique())[:500])
-        k = st.radio("Nombre de recommandations", [5, 10], horizontal=True)
-        sub = reco[(reco["candidate_id"] == cid) & (reco["rank"] <= k)].merge(
-            off[["id_offre", "intitule", "entreprise", "secteur", "lieu"]],
-            left_on="job_id", right_on="id_offre", how="left",
-        )
-        st.dataframe(sub[["rank", "job_id", "intitule", "entreprise", "secteur", "lieu", "score"]],
-                     use_container_width=True, hide_index=True)
+        with st.container(border=True):
+            render_card_open("Consulter les recommandations d'un candidat", "", icon="people")
+            cid = st.selectbox("Choisir un candidat", options=sorted(reco["candidate_id"].unique())[:500])
+            k = st.radio("Nombre de recommandations", [5, 10], horizontal=True)
+            sub = reco[(reco["candidate_id"] == cid) & (reco["rank"] <= k)].merge(
+                off[["id_offre", "intitule", "entreprise", "secteur", "lieu"]],
+                left_on="job_id", right_on="id_offre", how="left",
+            )
+            st.dataframe(sub[["rank", "job_id", "intitule", "entreprise", "secteur", "lieu", "score"]],
+                         use_container_width=True, hide_index=True)
 
 # ----------------------------------------------------------------- Recherche (Bonus 1)
 with tab_search:
+    render_page_intro(
+        "search", "Recherche intelligente",
+        "Bonus 1 — interrogez les offres ou les candidats en langage naturel, sans mot-clé exact.",
+        accent=CG_RIVER,
+    )
     with st.container(border=True):
-        render_card_open("Recherche en langage naturel", "Bonus 1 — requête libre, sans mot-clé exact", icon="search")
-        st.caption("Ex : « développeur Python à Brazzaville », « comptable avec mobilité nationale »")
+        render_card_open("Votre requête", "Ex : « développeur Python à Brazzaville », « comptable avec mobilité nationale »", icon="search")
         mode = st.radio("Rechercher parmi :", ["Offres", "Candidats"], horizontal=True)
         query = st.text_input("Votre requête")
         if query:
@@ -203,9 +212,13 @@ with tab_search:
 
 # ----------------------------------------------------------------- Skill gap (Bonus 2)
 with tab_skillgap:
+    render_page_intro(
+        "puzzle", "Écarts de compétences",
+        "Bonus 2 — pour une paire candidat/offre, identifiez les compétences déjà couvertes et celles qui manquent.",
+        accent=CG_RED,
+    )
     with st.container(border=True):
-        render_card_open("Analyse des écarts de compétences", "Bonus 2 — compatibilité candidat / offre", icon="puzzle")
-        st.caption("Disponible pour les offres issues du fichier d'extension (compétences détaillées).")
+        render_card_open("Analyse de compatibilité", "Disponible pour les offres issues du fichier d'extension (compétences détaillées).", icon="puzzle")
         ext_offers = off[off["competences"] != ""]
         if ext_offers.empty:
             st.info("Aucune offre avec compétences détaillées disponible.")

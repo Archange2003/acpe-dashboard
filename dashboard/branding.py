@@ -252,6 +252,26 @@ def render_map_card(caption: str = "") -> bool:
     return True
 
 
+def render_page_intro(icon: str, title: str, subtitle: str, accent: str = None):
+    """En-tête de page compact (icône + titre + description) utilisé en haut de
+    chaque onglet secondaire, pour une cohérence visuelle avec le bandeau hero
+    de la page d'accueil."""
+    import streamlit as st
+    accent = accent or CG_GREEN
+    st.markdown(
+        _clean(f"""
+        <div class="cg-page-intro" style="--intro-accent:{accent};">
+            <div class="cg-page-intro-icon">{icon_svg(icon, 26, accent)}</div>
+            <div>
+                <div class="cg-page-intro-title">{title}</div>
+                <div class="cg-page-intro-sub">{subtitle}</div>
+            </div>
+        </div>
+        """),
+        unsafe_allow_html=True,
+    )
+
+
 PLOTLY_COLORWAY = [CG_GREEN, CG_GOLD, CG_RIVER, CG_RED, "#6FA287", "#D9A441"]
 
 
@@ -447,6 +467,20 @@ def theme_css() -> str:
         color: #7a7a6a;
         font-weight: 600;
         letter-spacing: 0.3px;
+    }}
+    .cg-flag-motto {{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.45rem;
+    }}
+    .cg-motto-text {{
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: {CG_GOLD};
+        text-align: center;
+        white-space: nowrap;
     }}
 
     /* ---------- Titres de section signature ---------- */
@@ -732,6 +766,41 @@ def theme_css() -> str:
         color: #8a8a7a;
     }}
 
+    /* ---------- En-tête de page compact (onglets secondaires) ---------- */
+    .cg-page-intro {{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: linear-gradient(135deg, #ffffff 0%, #f7f5ee 100%);
+        border: 1px solid #eee7d3;
+        border-left: 5px solid var(--intro-accent, {CG_GREEN});
+        border-radius: 14px;
+        padding: 1.1rem 1.4rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 2px 10px rgba(22,36,28,0.05);
+    }}
+    .cg-page-intro-icon {{
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--intro-accent, {CG_GREEN}) 14%, white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+    }}
+    .cg-page-intro-title {{
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: {CG_INK};
+    }}
+    .cg-page-intro-sub {{
+        font-size: 0.88rem;
+        color: #7a7a6a;
+        margin-top: 0.15rem;
+    }}
+
     /* ---------- Pied de page ---------- */
     .cg-footer {{
         text-align: center;
@@ -748,11 +817,24 @@ def theme_css() -> str:
     """
 
 
+def flag_with_motto_html(flag_width: int = 60) -> str:
+    """Drapeau et devise nationale empilés verticalement (remplace le blason)."""
+    flag_h = round(flag_width * 43 / 64)
+    return _clean(f"""
+    <div class="cg-flag-motto">
+        {flag_svg(flag_width, flag_h)}
+        <div class="cg-motto-text">UNITÉ · TRAVAIL · PROGRÈS</div>
+    </div>
+    """)
+
+
 def render_header():
-    """Injecte le bandeau tricolore + l'en-tête (logo ACPE / titre / armoiries) via st.markdown."""
+    """Injecte : bannière ACPE (tout en haut), bandeau tricolore, puis l'en-tête
+    (logo ACPE / titre / drapeau+devise) via st.markdown."""
     import streamlit as st
 
     st.markdown(theme_css(), unsafe_allow_html=True)
+    render_banner_card()
     st.markdown('<div class="cg-topbar"></div>', unsafe_allow_html=True)
     st.markdown(
         _clean(f"""
@@ -761,9 +843,9 @@ def render_header():
             <div class="cg-header-center">
                 <div class="cg-title">🧭 Tableau de bord décisionnel</div>
                 <div class="cg-subtitle">Appariement Demandeurs d'emploi / Offres d'emploi</div>
-                <div class="cg-badge-flag-row">{flag_svg(28, 19)} Agence Congolaise pour l'Emploi (ACPE) — Hackathon IndabaX Congo 2026</div>
+                <div class="cg-badge-flag-row">Agence Congolaise pour l'Emploi (ACPE) — Hackathon IndabaX Congo 2026</div>
             </div>
-            <div class="cg-header-right">{get_coat_of_arms_html(92)}</div>
+            <div class="cg-header-right">{flag_with_motto_html(60)}</div>
         </div>
         """),
         unsafe_allow_html=True,
