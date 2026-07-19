@@ -190,7 +190,7 @@ if page == PAGES[1]:
         render_divider()
         with st.container(border=True):
             render_card_open("Consulter les recommandations d'un candidat", "", icon="people")
-            cid = st.selectbox("Choisir un candidat", options=sorted(reco["candidate_id"].unique())[:500])
+            cid = st.selectbox("Choisir un candidat", options=sorted(reco["candidate_id"].unique()))
             k = st.radio("Nombre de recommandations", [5, 10], horizontal=True)
             sub = reco[(reco["candidate_id"] == cid) & (reco["rank"] <= k)].merge(
                 off[["id_offre", "intitule", "entreprise", "secteur", "lieu"]],
@@ -233,7 +233,7 @@ if page == PAGES[3]:
         if ext_offers.empty:
             st.info("Aucune offre avec compétences détaillées disponible.")
         else:
-            cid2 = st.selectbox("Candidat", options=sorted(dem["id_demandeur"].unique())[:500], key="sg_cand")
+            cid2 = st.selectbox("Candidat", options=sorted(dem["id_demandeur"].unique()), key="sg_cand")
             jid2 = st.selectbox(
                 "Offre", options=ext_offers["id_offre"] + " — " + ext_offers["intitule"],
             )
